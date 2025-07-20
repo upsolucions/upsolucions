@@ -1,9 +1,0 @@
-{
-  "name": "backend",
-  "version": "1.0.0",
-  "scripts": {
-    "start:websocket": "node websocket.js"
-  },
-  "dependencies": {
-  }
-}

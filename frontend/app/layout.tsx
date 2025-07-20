@@ -1,3 +1,4 @@
+"use client"
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
@@ -12,21 +13,21 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Up Solicions - Segurança Tecnológica",
+  title: "Up Solucions",
   description:
     "Especialistas em sistemas de segurança, automação e tecnologia. Câmeras, alarmes, controle de acesso, automação residencial e muito mais.",
   keywords: "segurança, câmeras, alarmes, automação, controle de acesso, Rio de Janeiro",
   viewport: "width=device-width, initial-scale=1",
   robots: "index, follow",
-  authors: [{ name: "Up Solicions" }],
-  creator: "Up Solicions",
-  publisher: "Up Solicions",
+  authors: [{ name: "Up Solucions" }],
+  creator: "Up Solucions",
+  publisher: "Up Solucions",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-    generator: 'v0.dev'
+    generator: 'up solucions'
 }
 
 export default function RootLayout({

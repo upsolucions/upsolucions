@@ -261,7 +261,7 @@ export default function GaleriaPage() {
                       multiline
                     />
                     <p className="text-gray-500 text-xs mt-2">
-                      Projeto realizado com sucesso pela equipe {siteContent?.siteName || "Up Solicions"}
+                      Projeto realizado com sucesso pela equipe {siteContent?.siteName || "Up Solucions"}
                     </p>
                   </CardContent>
                 </Card>
@@ -362,7 +362,7 @@ export default function GaleriaPage() {
                 <div>
                   <EditableText
                     path="siteName"
-                    value={siteContent?.siteName || "Up Solicions"}
+                    value={siteContent?.siteName || "Up Solucions"}
                     className="text-xl font-bold"
                     as="h4"
                   />
