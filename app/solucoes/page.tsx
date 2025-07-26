@@ -12,17 +12,25 @@ import { ImageUploadModal } from "@/components/admin/image-upload-modal"
 import { useAdmin } from "@/contexts/admin-context"
 
 export default function SolucoesPage() {
-  const { siteContent, isAdmin, updateContent } = useAdmin()
+  const { siteContent, isAdmin, updateContent, uploadImage } = useAdmin()
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [selectedSolutionIndex, setSelectedSolutionIndex] = useState<number | null>(null)
 
   const solutionIcons = [Zap, Droplets, Car]
 
-  const handleImageUpload = async (imageUrl: string, title: string, alt: string) => {
+  const handleImageUpload = async (file: File, title: string, alt: string) => {
     if (selectedSolutionIndex !== null) {
-      await updateContent(`solutions.items.${selectedSolutionIndex}.image`, imageUrl)
-      setShowUploadModal(false)
-      setSelectedSolutionIndex(null)
+      // useAdmin().uploadImage now handles generating the unique storage path.
+      const imageUrl = await uploadImage(`solutions.items.${selectedSolutionIndex}.image`, file)
+      if (imageUrl) {
+        // Update the specific solution's image URL in the content
+        await updateContent(`solutions.items.${selectedSolutionIndex}.image`, imageUrl)
+        setShowUploadModal(false)
+        setSelectedSolutionIndex(null)
+      } else {
+        console.error("Failed to upload solution image to Supabase. Image will not be updated.")
+        // Optionally, show an error message to the user here
+      }
     }
   }
 

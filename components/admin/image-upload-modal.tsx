@@ -11,16 +11,17 @@ import { Textarea } from "@/components/ui/textarea"
 import { Upload, X, Loader2, ImageIcon } from "lucide-react"
 import { useAdmin } from "@/contexts/admin-context"
 
-interface GalleryUploadProps {
+interface ImageUploadModalProps {
   isOpen: boolean
   onClose: () => void
-  onUpload: (imageUrl: string, title: string, alt: string) => Promise<void>
+  onUpload: (file: File, title: string, alt: string) => Promise<void>
+  title?: string
 }
 
-export function GalleryUpload({ isOpen, onClose, onUpload }: GalleryUploadProps) {
+export function ImageUploadModal({ isOpen, onClose, onUpload, title = "Upload de Imagem" }: ImageUploadModalProps) {
   const { uploadImage } = useAdmin()
   const [isUploading, setIsUploading] = useState(false)
-  const [title, setTitle] = useState("")
+  const [imageTitle, setImageTitle] = useState("")
   const [alt, setAlt] = useState("")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -53,11 +54,11 @@ export function GalleryUpload({ isOpen, onClose, onUpload }: GalleryUploadProps)
     reader.readAsDataURL(file)
 
     // Auto-fill title and alt if empty
-    if (!title) {
-      setTitle(file.name.split(".")[0].replace(/[-_]/g, " "))
+    if (!imageTitle) {
+      setImageTitle(file.name.split(".")[0].replace(/[-_]/g, " "))
     }
     if (!alt) {
-      setAlt(`Projeto ${file.name.split(".")[0]}`)
+      setAlt(`Imagem ${file.name.split(".")[0]}`)
     }
   }
 
@@ -66,33 +67,12 @@ export function GalleryUpload({ isOpen, onClose, onUpload }: GalleryUploadProps)
       setError("Por favor, selecione uma imagem.")
       return
     }
-
-    if (!title.trim()) {
-      setError("Por favor, adicione um título.")
-      return
-    }
-
     setIsUploading(true)
     setError(null)
-
     try {
-      // Always use base64 for immediate display
-      const reader = new FileReader()
-      reader.onload = async (e) => {
-        const imageUrl = e.target?.result as string
-
-        try {
-          await onUpload(imageUrl, title.trim(), alt.trim() || title.trim())
-          handleClose()
-        } catch (uploadError) {
-          console.error("Error in onUpload:", uploadError)
-          setError("Erro ao adicionar imagem à galeria.")
-        }
-      }
-      reader.onerror = () => {
-        setError("Erro ao processar a imagem.")
-      }
-      reader.readAsDataURL(selectedFile)
+      // Pass the File object directly to the onUpload prop
+      await onUpload(selectedFile, imageTitle.trim() || "Nova Imagem", alt.trim() || imageTitle.trim())
+      handleClose()
     } catch (error) {
       console.error("Error uploading image:", error)
       setError("Erro ao fazer upload da imagem. Tente novamente.")
@@ -102,7 +82,7 @@ export function GalleryUpload({ isOpen, onClose, onUpload }: GalleryUploadProps)
   }
 
   const handleClose = () => {
-    setTitle("")
+    setImageTitle("")
     setAlt("")
     setSelectedFile(null)
     setPreviewUrl(null)
@@ -119,7 +99,7 @@ export function GalleryUpload({ isOpen, onClose, onUpload }: GalleryUploadProps)
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Adicionar Nova Foto</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -158,13 +138,12 @@ export function GalleryUpload({ isOpen, onClose, onUpload }: GalleryUploadProps)
 
           {/* Title Input */}
           <div className="space-y-2">
-            <Label htmlFor="title">Título do Projeto *</Label>
+            <Label htmlFor="title">Título da Imagem</Label>
             <Input
               id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ex: Sistema de Videomonitoramento - Empresa XYZ"
-              required
+              value={imageTitle}
+              onChange={(e) => setImageTitle(e.target.value)}
+              placeholder="Ex: Automação Residencial"
             />
           </div>
 
@@ -175,7 +154,7 @@ export function GalleryUpload({ isOpen, onClose, onUpload }: GalleryUploadProps)
               id="alt"
               value={alt}
               onChange={(e) => setAlt(e.target.value)}
-              placeholder="Descrição detalhada do projeto para acessibilidade"
+              placeholder="Descrição da imagem para acessibilidade"
               className="min-h-[80px]"
             />
           </div>
@@ -193,12 +172,12 @@ export function GalleryUpload({ isOpen, onClose, onUpload }: GalleryUploadProps)
               {isUploading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Adicionando...
+                  Enviando...
                 </>
               ) : (
                 <>
                   <Upload className="w-4 h-4 mr-2" />
-                  Adicionar à Galeria
+                  Fazer Upload
                 </>
               )}
             </Button>

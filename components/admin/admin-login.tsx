@@ -68,7 +68,7 @@ export function AdminLogin() {
 
   const getWeekKey = (date: Date) => {
     const startOfWeek = new Date(date)
-    startOfWeek.setDate(date.getDate() - date.getDay())
+    startOfWeek.setDate(date.getDate() - startOfWeek.getDay()) // Go to Sunday
     return startOfWeek.toDateString()
   }
 

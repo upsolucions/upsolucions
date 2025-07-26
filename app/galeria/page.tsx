@@ -13,7 +13,7 @@ import { GalleryUpload } from "@/components/admin/gallery-upload"
 import { useAdmin } from "@/contexts/admin-context"
 
 export default function GaleriaPage() {
-  const { siteContent, isAdmin, updateContent } = useAdmin()
+  const { siteContent, isAdmin, updateContent, uploadImage } = useAdmin()
   const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string; title: string } | null>(null)
   const [mounted, setMounted] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
@@ -23,37 +23,43 @@ export default function GaleriaPage() {
     setMounted(true)
   }, [])
 
-  const addNewMainImage = async (imageUrl: string, title: string, alt: string) => {
-    const newImage = {
-      src: imageUrl,
-      title: title || `Projeto ${(siteContent?.gallery?.mainImages?.length || 0) + 1}`,
-      alt: alt || `Descrição do projeto ${(siteContent?.gallery?.mainImages?.length || 0) + 1}`,
+  const addNewMainImage = async (file: File, title: string, alt: string) => {
+    // The path for the image in storage should be unique, but also reflect its place in content.
+    // useAdmin().uploadImage now handles generating the unique storage path.
+    const imageUrl = await uploadImage(`gallery.mainImages.${siteContent?.gallery?.mainImages?.length || 0}`, file)
+    if (imageUrl) {
+      const newImage = {
+        src: imageUrl, // This is the persistent URL from Supabase Storage
+        title: title || `Projeto ${(siteContent?.gallery?.mainImages?.length || 0) + 1}`,
+        alt: alt || `Descrição do projeto ${(siteContent?.gallery?.mainImages?.length || 0) + 1}`,
+      }
+      const currentImages = siteContent?.gallery?.mainImages || []
+      const updatedImages = [...currentImages, newImage]
+      await updateContent("gallery.mainImages", updatedImages) // Update content with the new image object
+      setShowUploadModal(false)
+      setImageLoadErrors({})
+    } else {
+      console.error("Failed to upload main image to Supabase. Image will not be added.")
+      // Optionally, show an error message to the user here
     }
-
-    const currentImages = siteContent?.gallery?.mainImages || []
-    const updatedImages = [...currentImages, newImage]
-
-    await updateContent("gallery.mainImages", updatedImages)
-    setShowUploadModal(false)
-
-    // Force re-render to show new image
-    setImageLoadErrors({})
   }
 
-  const addNewSubImage = async (imageUrl: string, title: string, alt: string) => {
-    const newImage = {
-      src: imageUrl,
-      title: title || `Projeto ${(siteContent?.gallery?.subGallery?.length || 0) + 1}`,
-      alt: alt || `Descrição do projeto ${(siteContent?.gallery?.subGallery?.length || 0) + 1}`,
+  const addNewSubImage = async (file: File, title: string, alt: string) => {
+    const imageUrl = await uploadImage(`gallery.subGallery.${siteContent?.gallery?.subGallery?.length || 0}`, file)
+    if (imageUrl) {
+      const newImage = {
+        src: imageUrl,
+        title: title || `Projeto ${(siteContent?.gallery?.subGallery?.length || 0) + 1}`,
+        alt: alt || `Descrição do projeto ${(siteContent?.gallery?.subGallery?.length || 0) + 1}`,
+      }
+      const currentImages = siteContent?.gallery?.subGallery || []
+      const updatedImages = [...currentImages, newImage]
+      await updateContent("gallery.subGallery", updatedImages)
+      setImageLoadErrors({})
+    } else {
+      console.error("Failed to upload sub image to Supabase. Image will not be added.")
+      // Optionally, show an error message to the user here
     }
-
-    const currentImages = siteContent?.gallery?.subGallery || []
-    const updatedImages = [...currentImages, newImage]
-
-    await updateContent("gallery.subGallery", updatedImages)
-
-    // Force re-render to show new image
-    setImageLoadErrors({})
   }
 
   const removeMainImage = async (index: number) => {
@@ -176,16 +182,7 @@ export default function GaleriaPage() {
                     if (files) {
                       for (let i = 0; i < files.length; i++) {
                         const file = files[i]
-                        try {
-                          const reader = new FileReader()
-                          reader.onload = async (event) => {
-                            const imageUrl = event.target?.result as string
-                            await addNewSubImage(imageUrl, file.name.split(".")[0], `Projeto ${file.name}`)
-                          }
-                          reader.readAsDataURL(file)
-                        } catch (error) {
-                          console.error("Erro ao adicionar imagem:", error)
-                        }
+                        await addNewSubImage(file, file.name.split(".")[0], `Projeto ${file.name}`)
                       }
                     }
                   }
@@ -261,7 +258,7 @@ export default function GaleriaPage() {
                       multiline
                     />
                     <p className="text-gray-500 text-xs mt-2">
-                      Projeto realizado com sucesso pela equipe {siteContent?.siteName || "Up Solucions"}
+                      Projeto realizado com sucesso pela equipe {siteContent?.siteName || "Up Solicions"}
                     </p>
                   </CardContent>
                 </Card>
@@ -362,7 +359,7 @@ export default function GaleriaPage() {
                 <div>
                   <EditableText
                     path="siteName"
-                    value={siteContent?.siteName || "Up Solucions"}
+                    value={siteContent?.siteName || "Up Solicions"}
                     className="text-xl font-bold"
                     as="h4"
                   />

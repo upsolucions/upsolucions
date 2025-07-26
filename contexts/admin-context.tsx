@@ -1,16 +1,18 @@
 "use client"
 
-import type React from "react"
+import React from "react"
+
+import type { ReactNode } from "react"
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react"
-import { siteContentService } from "@/lib/supabase"
+import { siteContentService, supabase } from "@/lib/supabase"
 
 interface AdminContextType {
   isAdmin: boolean
   login: (username: string, password: string) => boolean
   logout: () => void
   siteContent: any
-  updateContent: (path: string, value: any, skipWebSocket?: boolean) => Promise<void>
-  uploadImage: (path: string, file: File) => Promise<string | null>
+  updateContent: (path: string, value: any) => Promise<void>
+  uploadImage: (contentPath: string, file: File) => Promise<string | null>
   isLoading: boolean
 }
 
@@ -233,23 +235,26 @@ const defaultContent = {
   },
 }
 
-export function AdminProvider({ children }: { children: React.ReactNode }) {
+export function AdminProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false)
   const [siteContent, setSiteContent] = useState(defaultContent)
   const [isLoading, setIsLoading] = useState(true)
+  const debounceTimer = React.useRef<NodeJS.Timeout | null>(null) // Use useRef for mutable ref
 
   useEffect(() => {
-    const loadContent = async () => {
+    const loadContentAndSetupRealtime = async () => {
+      console.log("[AdminProvider] Iniciando carregamento de conteúdo e setup do Realtime.")
       try {
-        // Check localStorage first for faster loading
+        // 1. Load from localStorage first (for faster initial render)
         if (typeof window !== "undefined") {
           const localContent = localStorage.getItem("siteContent")
           if (localContent) {
             try {
               const parsedContent = JSON.parse(localContent)
               setSiteContent({ ...defaultContent, ...parsedContent })
+              console.log("[AdminProvider] Conteúdo carregado do localStorage.")
             } catch (error) {
-              console.error("Error parsing localStorage content:", error)
+              console.error("[AdminProvider] Erro ao parsear conteúdo do localStorage:", error)
               localStorage.removeItem("siteContent")
             }
           }
@@ -257,11 +262,13 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
           const adminStatus = localStorage.getItem("isAdmin")
           if (adminStatus === "true") {
             setIsAdmin(true)
+            console.log("[AdminProvider] Status de admin carregado do localStorage: true.")
           }
         }
 
-        // Then load from Supabase
+        // 2. Then load from Supabase (source of truth)
         try {
+          console.log("[AdminProvider] Tentando carregar conteúdo do Supabase...")
           const dbContent = await siteContentService.getSiteContent()
           if (dbContent) {
             const mergedContent = { ...defaultContent, ...dbContent }
@@ -270,37 +277,59 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
             if (typeof window !== "undefined") {
               localStorage.setItem("siteContent", JSON.stringify(mergedContent))
             }
+            console.log("[AdminProvider] Conteúdo carregado do Supabase e mesclado.", mergedContent)
+          } else {
+            console.log("[AdminProvider] Nenhum conteúdo encontrado no Supabase, usando default.")
           }
         } catch (dbError) {
-          console.warn("Database load failed, using local content:", dbError)
+          console.warn("[AdminProvider] Falha no carregamento inicial do banco de dados:", dbError)
         }
       } catch (error) {
-        console.error("Error loading content:", error)
+        console.error("[AdminProvider] Erro geral ao carregar conteúdo:", error)
         setSiteContent(defaultContent)
       } finally {
         setIsLoading(false)
+        console.log("[AdminProvider] Carregamento inicial concluído.")
       }
     }
 
-    loadContent()
+    loadContentAndSetupRealtime()
 
-    // Set up periodic sync with database
-    const syncInterval = setInterval(async () => {
-      try {
-        const dbContent = await siteContentService.getSiteContent()
-        if (dbContent) {
-          const mergedContent = { ...defaultContent, ...dbContent }
-          setSiteContent(mergedContent)
-          if (typeof window !== "undefined") {
-            localStorage.setItem("siteContent", JSON.stringify(mergedContent))
-          }
-        }
-      } catch (error) {
-        console.warn("Periodic sync failed:", error)
+    // 3. Set up Supabase Realtime subscription for continuous updates
+    console.log("[AdminProvider] Configurando Realtime Subscription...")
+    const channel = supabase
+      .channel("site_content_changes")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "site_content", filter: `id=eq.main` },
+        (payload) => {
+          console.log("[AdminProvider] Realtime: Mudança detectada no site_content!", payload)
+          const updatedContent = payload.new.content
+          setSiteContent((prevContent) => {
+            const mergedContent = { ...defaultContent, ...updatedContent }
+            // Only update if content has actually changed to avoid unnecessary re-renders
+            if (JSON.stringify(prevContent) !== JSON.stringify(mergedContent)) {
+              if (typeof window !== "undefined") {
+                localStorage.setItem("siteContent", JSON.stringify(mergedContent))
+              }
+              console.log("[AdminProvider] Realtime: Conteúdo atualizado via subscription.", mergedContent)
+              return mergedContent
+            }
+            console.log("[AdminProvider] Realtime: Conteúdo inalterado, ignorando atualização.")
+            return prevContent
+          })
+        },
+      )
+      .subscribe()
+
+    // Cleanup function
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current)
       }
-    }, 30000) // Sync every 30 seconds
-
-    return () => clearInterval(syncInterval)
+      console.log("[AdminProvider] Desinscrevendo do canal Realtime.")
+      channel.unsubscribe()
+    }
   }, [])
 
   const login = useCallback((username: string, password: string) => {
@@ -309,8 +338,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       if (typeof window !== "undefined") {
         localStorage.setItem("isAdmin", "true")
       }
+      console.log("[AdminContext] Login bem-sucedido.")
       return true
     }
+    console.log("[AdminContext] Login falhou: credenciais inválidas.")
     return false
   }, [])
 
@@ -319,9 +350,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== "undefined") {
       localStorage.removeItem("isAdmin")
     }
+    console.log("[AdminContext] Logout realizado.")
   }, [])
 
-  const updateContent = useCallback(async (path: string, value: any, skipWebSocket = false) => {
+  // updateContent now handles local state update and debounced Supabase update
+  const updateContent = useCallback(async (path: string, value: any) => {
     setSiteContent((prevContent) => {
       const newContent = { ...prevContent }
       const keys = path.split(".")
@@ -333,99 +366,83 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       }
 
       current[keys[keys.length - 1]] = value
+      console.log(`[AdminContext] updateContent: Atualizando estado local para path '${path}' com valor:`, value)
 
       // Save to localStorage immediately
       if (typeof window !== "undefined") {
         try {
           localStorage.setItem("siteContent", JSON.stringify(newContent))
+          console.log("[AdminContext] updateContent: Conteúdo salvo no localStorage.")
         } catch (error) {
-          console.error("Error saving to localStorage:", error)
+          console.error("[AdminContext] updateContent: Erro ao salvar no localStorage:", error)
         }
       }
 
-      // Send WebSocket update if not skipped (to avoid loops)
-      if (!skipWebSocket && typeof window !== "undefined") {
-        // We'll access the WebSocket context from the component level
-        const event = new CustomEvent("contentUpdate", {
-          detail: { path, value },
-        })
-        window.dispatchEvent(event)
+      // Debounce saving to database to prevent excessive writes
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current)
       }
-
-      // Save to Supabase with retry logic
-      const saveToDatabase = async (retries = 3) => {
+      debounceTimer.current = setTimeout(async () => {
         try {
+          console.log("[AdminContext] updateContent: Tentando salvar conteúdo no Supabase (debounced)...", newContent)
           const success = await siteContentService.updateSiteContent(newContent)
-          if (!success && retries > 0) {
-            setTimeout(() => saveToDatabase(retries - 1), 2000)
+          if (!success) {
+            console.warn("[AdminContext] updateContent: Falha ao salvar no Supabase após debounce.")
+          } else {
+            console.log("[AdminContext] updateContent: Conteúdo salvo com sucesso no Supabase.")
           }
         } catch (error) {
-          console.error("Error saving to database:", error)
-          if (retries > 0) {
-            setTimeout(() => saveToDatabase(retries - 1), 2000)
-          }
+          console.error("[AdminContext] updateContent: Erro ao salvar no banco de dados (debounced):", error)
         }
-      }
-
-      // Debounced save to database
-      setTimeout(() => saveToDatabase(), 1000)
+      }, 1000) // Adjust debounce time as needed
 
       return newContent
     })
   }, [])
 
-  const uploadImage = useCallback(async (path: string, file: File): Promise<string | null> => {
-    try {
-      // Validate file
-      if (!file.type.startsWith("image/")) {
-        throw new Error("Por favor, selecione apenas arquivos de imagem.")
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error("Arquivo muito grande. Máximo 5MB.")
-      }
-
-      // Try Supabase upload first
+  const uploadImage = useCallback(
+    async (contentPath: string, file: File): Promise<string | null> => {
+      console.log(`[AdminContext] uploadImage: Iniciando upload para contentPath: '${contentPath}' e arquivo:`, file)
       try {
-        const supabaseUrl = await siteContentService.uploadImage(file, path)
-        if (supabaseUrl) {
-          // Send WebSocket update for image upload
-          if (typeof window !== "undefined") {
-            const event = new CustomEvent("imageUpload", {
-              detail: { path, imageUrl: supabaseUrl },
-            })
-            window.dispatchEvent(event)
-          }
-          return supabaseUrl
+        // Validate file
+        if (!file.type.startsWith("image/")) {
+          console.error("[AdminContext] uploadImage: Erro de validação: Não é um arquivo de imagem.")
+          throw new Error("Por favor, selecione apenas arquivos de imagem.")
         }
-      } catch (supabaseError) {
-        console.warn("Supabase upload failed, using base64:", supabaseError)
+        if (file.size > 5 * 1024 * 1024) {
+          console.error("[AdminContext] uploadImage: Erro de validação: Arquivo muito grande (>5MB).")
+          throw new Error("Arquivo muito grande. Máximo 5MB.")
+        }
+
+        // Construct a unique storage path based on contentPath and timestamp
+        const fileExt = file.name.split(".").pop()
+        const sanitizedContentPath = contentPath.replace(/[^a-zA-Z0-9]/g, "_") // Sanitize for storage path
+        const storageFileName = `${sanitizedContentPath}-${Date.now()}.${fileExt}`
+        const storageFilePath = `images/${storageFileName}` // Full path in the bucket
+        console.log(`[AdminContext] uploadImage: Caminho de armazenamento gerado: '${storageFilePath}'`)
+
+        // Attempt Supabase storage upload
+        console.log("[AdminContext] uploadImage: Chamando siteContentService.uploadImage...")
+        const newImageUrl = await siteContentService.uploadImage(file, storageFilePath)
+
+        if (newImageUrl) {
+          console.log("[AdminContext] uploadImage: Imagem enviada para Supabase Storage com sucesso. URL:", newImageUrl)
+          // Update content in the database with the new public URL
+          // This will trigger the Realtime listener on other clients.
+          await updateContent(contentPath, newImageUrl)
+          console.log("[AdminContext] uploadImage: updateContent chamado com a nova URL.")
+          return newImageUrl
+        } else {
+          console.error("[AdminContext] uploadImage: Falha ao enviar imagem para Supabase Storage. Retornando null.")
+          return null
+        }
+      } catch (error) {
+        console.error("[AdminContext] uploadImage: Erro geral no processo de upload:", error)
+        throw error
       }
-
-      // Fallback to base64 for local storage
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          const imageUrl = e.target?.result as string
-
-          // Send WebSocket update for image upload
-          if (typeof window !== "undefined") {
-            const event = new CustomEvent("imageUpload", {
-              detail: { path, imageUrl },
-            })
-            window.dispatchEvent(event)
-          }
-
-          resolve(imageUrl)
-        }
-        reader.onerror = () => reject(new Error("Erro ao ler o arquivo"))
-        reader.readAsDataURL(file)
-      })
-    } catch (error) {
-      console.error("Error uploading image:", error)
-      throw error
-    }
-  }, [])
+    },
+    [updateContent],
+  )
 
   const contextValue = useMemo(
     () => ({

@@ -1,32 +1,24 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useRef } from "react"
+import React from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Upload, X, Loader2, ImageIcon } from "lucide-react"
-import { useAdmin } from "@/contexts/admin-context"
+import { ImageIcon, Upload, X, Loader2 } from "lucide-react"
 
-interface ImageUploadModalProps {
+const GalleryUpload: React.FC<{
   isOpen: boolean
   onClose: () => void
-  onUpload: (imageUrl: string, title: string, alt: string) => Promise<void>
-  title?: string
-}
-
-export function ImageUploadModal({ isOpen, onClose, onUpload, title = "Upload de Imagem" }: ImageUploadModalProps) {
-  const { uploadImage } = useAdmin()
-  const [isUploading, setIsUploading] = useState(false)
-  const [imageTitle, setImageTitle] = useState("")
-  const [alt, setAlt] = useState("")
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  onUpload: (file: File, title: string, alt: string) => Promise<void>
+}> = ({ isOpen, onClose, onUpload }) => {
+  const [title, setTitle] = React.useState("")
+  const [alt, setAlt] = React.useState("")
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null)
+  const [error, setError] = React.useState<string | null>(null)
+  const [isUploading, setIsUploading] = React.useState(false)
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -54,11 +46,11 @@ export function ImageUploadModal({ isOpen, onClose, onUpload, title = "Upload de
     reader.readAsDataURL(file)
 
     // Auto-fill title and alt if empty
-    if (!imageTitle) {
-      setImageTitle(file.name.split(".")[0].replace(/[-_]/g, " "))
+    if (!title) {
+      setTitle(file.name.split(".")[0].replace(/[-_]/g, " "))
     }
     if (!alt) {
-      setAlt(`Imagem ${file.name.split(".")[0]}`)
+      setAlt(`Projeto ${file.name.split(".")[0]}`)
     }
   }
 
@@ -67,28 +59,16 @@ export function ImageUploadModal({ isOpen, onClose, onUpload, title = "Upload de
       setError("Por favor, selecione uma imagem.")
       return
     }
-
+    if (!title.trim()) {
+      setError("Por favor, adicione um título.")
+      return
+    }
     setIsUploading(true)
     setError(null)
-
     try {
-      // Always use base64 for immediate display
-      const reader = new FileReader()
-      reader.onload = async (e) => {
-        const imageUrl = e.target?.result as string
-
-        try {
-          await onUpload(imageUrl, imageTitle.trim() || "Nova Imagem", alt.trim() || imageTitle.trim())
-          handleClose()
-        } catch (uploadError) {
-          console.error("Error in onUpload:", uploadError)
-          setError("Erro ao fazer upload da imagem.")
-        }
-      }
-      reader.onerror = () => {
-        setError("Erro ao processar a imagem.")
-      }
-      reader.readAsDataURL(selectedFile)
+      // Pass the File object directly to the onUpload prop
+      await onUpload(selectedFile, title.trim(), alt.trim() || title.trim())
+      handleClose()
     } catch (error) {
       console.error("Error uploading image:", error)
       setError("Erro ao fazer upload da imagem. Tente novamente.")
@@ -98,7 +78,7 @@ export function ImageUploadModal({ isOpen, onClose, onUpload, title = "Upload de
   }
 
   const handleClose = () => {
-    setImageTitle("")
+    setTitle("")
     setAlt("")
     setSelectedFile(null)
     setPreviewUrl(null)
@@ -115,20 +95,27 @@ export function ImageUploadModal({ isOpen, onClose, onUpload, title = "Upload de
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle>Adicionar Nova Foto</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* File Upload Area */}
           <div className="space-y-2">
-            <Label>Imagem</Label>
+            <label htmlFor="file-upload">Imagem</label>
             <div
               className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
                 selectedFile ? "border-green-300 bg-green-50" : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
               }`}
               onClick={triggerFileInput}
             >
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
+              <input
+                ref={fileInputRef}
+                id="file-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
 
               {previewUrl ? (
                 <div className="space-y-2">
@@ -154,23 +141,24 @@ export function ImageUploadModal({ isOpen, onClose, onUpload, title = "Upload de
 
           {/* Title Input */}
           <div className="space-y-2">
-            <Label htmlFor="title">Título da Imagem</Label>
+            <label htmlFor="title">Título do Projeto *</label>
             <Input
               id="title"
-              value={imageTitle}
-              onChange={(e) => setImageTitle(e.target.value)}
-              placeholder="Ex: Automação Residencial"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ex: Sistema de Videomonitoramento - Empresa XYZ"
+              required
             />
           </div>
 
           {/* Alt Text Input */}
           <div className="space-y-2">
-            <Label htmlFor="alt">Descrição (Alt Text)</Label>
+            <label htmlFor="alt">Descrição (Alt Text)</label>
             <Textarea
               id="alt"
               value={alt}
               onChange={(e) => setAlt(e.target.value)}
-              placeholder="Descrição da imagem para acessibilidade"
+              placeholder="Descrição detalhada do projeto para acessibilidade"
               className="min-h-[80px]"
             />
           </div>
@@ -188,12 +176,12 @@ export function ImageUploadModal({ isOpen, onClose, onUpload, title = "Upload de
               {isUploading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Enviando...
+                  Adicionando...
                 </>
               ) : (
                 <>
                   <Upload className="w-4 h-4 mr-2" />
-                  Fazer Upload
+                  Adicionar à Galeria
                 </>
               )}
             </Button>
@@ -207,3 +195,6 @@ export function ImageUploadModal({ isOpen, onClose, onUpload, title = "Upload de
     </Dialog>
   )
 }
+
+export default GalleryUpload
+export { GalleryUpload }

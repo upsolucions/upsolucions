@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Edit, Check, X, Loader2 } from "lucide-react"
 import { useAdmin } from "@/contexts/admin-context"
-import { useWebSocketContext } from "@/contexts/websocket-context"
 
 interface EditableTextProps {
   path: string
@@ -28,16 +27,16 @@ export function EditableText({
   as = "span",
 }: EditableTextProps) {
   const { isAdmin, updateContent } = useAdmin()
-  const { sendContentUpdate } = useWebSocketContext()
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(value)
   const [isSaving, setIsSaving] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
 
+  // Sync local editValue with prop value when prop changes (due to Realtime or initial load)
   useEffect(() => {
     setEditValue(value)
-    setHasUnsavedChanges(false)
+    setHasUnsavedChanges(false) // Reset unsaved changes flag
   }, [value])
 
   useEffect(() => {
@@ -46,24 +45,6 @@ export function EditableText({
       inputRef.current.select()
     }
   }, [isEditing])
-
-  // Listen for WebSocket content updates
-  useEffect(() => {
-    const handleContentUpdate = (event: CustomEvent) => {
-      const { path: updatePath, value: updateValue } = event.detail
-      if (updatePath === path && updateValue !== editValue) {
-        setEditValue(updateValue)
-        setHasUnsavedChanges(false)
-      }
-    }
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("contentUpdate", handleContentUpdate as EventListener)
-      return () => {
-        window.removeEventListener("contentUpdate", handleContentUpdate as EventListener)
-      }
-    }
-  }, [path, editValue])
 
   const handleSave = async () => {
     if (editValue === value) {
@@ -74,12 +55,7 @@ export function EditableText({
 
     setIsSaving(true)
     try {
-      // Update content locally (this will skip WebSocket to avoid loops)
-      await updateContent(path, editValue, true)
-
-      // Send WebSocket update to other clients
-      sendContentUpdate(path, editValue)
-
+      await updateContent(path, editValue) // This now triggers Supabase update
       setIsEditing(false)
       setHasUnsavedChanges(false)
     } catch (error) {
@@ -139,7 +115,7 @@ export function EditableText({
           />
         )}
         <div className="flex gap-2 mt-2">
-          <Button size="sm" onClick={handleSave} disabled={isSaving}>
+          <Button size="sm" onClick={handleSave} disabled={isSaving || !hasUnsavedChanges}>
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
           </Button>
           <Button size="sm" variant="outline" onClick={handleCancel} disabled={isSaving}>
