@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background with subtle pattern -->
+  <defs>
+    <pattern id="arrowPattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M30 10 L30 50 M20 40 L30 50 L40 40" stroke="#B8E6E1" stroke-width="2" fill="none" opacity="0.3"/>
+    </pattern>
+  </defs>
+  
+  <rect width="800" height="600" fill="#E0F2F1"/>
+  <rect width="800" height="600" fill="url(#arrowPattern)"/>
+  
+  <!-- Main logo content -->
+  <g transform="translate(400,300)">
+    <!-- UP text with arrow -->
+    <g transform="translate(0,-50)">
+      <!-- Arrow pointing up -->
+      <path d="M0 -80 L-25 -55 L-10 -55 L-10 -20 L10 -20 L10 -55 L25 -55 Z" fill="#1B5E20"/>
+      
+      <!-- U letter -->
+      <path d="M-80 -20 L-80 40 Q-80 60 -60 60 L-40 60 Q-20 60 -20 40 L-20 -20 L-40 -20 L-40 40 Q-40 45 -45 45 L-55 45 Q-60 45 -60 40 L-60 -20 Z" fill="#1B5E20"/>
+      
+      <!-- P letter -->
+      <path d="M20 -20 L20 60 L40 60 L40 20 L60 20 Q80 20 80 0 L80 -10 Q80 -20 60 -20 Z M40 -5 L40 5 L60 5 Q65 5 65 0 L65 -5 Q65 -10 60 -10 L40 -10 Z" fill="#1B5E20"/>
+    </g>
+    
+    <!-- SOLUCIONS text -->
+    <g transform="translate(0,80)" font-family="Arial, sans-serif" font-weight="bold" font-size="48" fill="#1B5E20" text-anchor="middle">
+      <text>SOLUCIONS</text>
+    </g>
+  </g>
+</svg>

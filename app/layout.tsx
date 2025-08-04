@@ -1,8 +1,16 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import dynamic from "next/dynamic"
 import "./globals.css"
-import { AdminProvider } from "@/contexts/admin-context"
+
+// Lazy load dos providers para melhor performance
+const AdminProvider = dynamic(() => import("@/contexts/admin-context").then(mod => ({ default: mod.AdminProvider })), {
+  ssr: true,
+})
+const ClienteProvider = dynamic(() => import("@/contexts/cliente-context").then(mod => ({ default: mod.ClienteProvider })), {
+  ssr: true,
+})
 
 const inter = Inter({
   subsets: ["latin"],
@@ -47,7 +55,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className={inter.className}>
-        <AdminProvider>{children}</AdminProvider>
+        <AdminProvider>
+          <ClienteProvider>
+            {children}
+          </ClienteProvider>
+        </AdminProvider>
       </body>
     </html>
   )

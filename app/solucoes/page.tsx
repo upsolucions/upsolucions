@@ -48,13 +48,13 @@ export default function SolucoesPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center overflow-hidden">
+              <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center overflow-hidden">
                 <EditableImage
                   path="logo"
                   src={siteContent.logo}
                   alt="Logo"
-                  width={48}
-                  height={48}
+                  width={53}
+                  height={53}
                   className="object-contain"
                 />
               </div>
@@ -206,13 +206,13 @@ export default function SolucoesPage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-11 h-11 bg-green-600 rounded-lg flex items-center justify-center overflow-hidden">
                   <EditableImage
                     path="logo"
                     src={siteContent.logo}
                     alt="Logo"
-                    width={40}
-                    height={40}
+                    width={44}
+                    height={44}
                     className="object-contain"
                   />
                 </div>

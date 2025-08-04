@@ -5,6 +5,7 @@ import React from "react"
 import type { ReactNode } from "react"
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react"
 import { siteContentService, supabase } from "@/lib/supabase"
+import { ImageStorageService } from "@/lib/image-storage"
 
 interface AdminContextType {
   isAdmin: boolean
@@ -21,7 +22,7 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined)
 const defaultContent = {
   siteName: "Up Solicions",
   slogan: "Segurança Tecnológica",
-  logo: "/placeholder.svg?height=48&width=48&text=Logo",
+  logo: "/up-solucions-logo.svg",
   hero: {
     title: "Segurança Tecnológica Profissional",
     subtitle:
@@ -358,7 +359,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     setSiteContent((prevContent) => {
       const newContent = { ...prevContent }
       const keys = path.split(".")
-      let current = newContent
+      let current: any = newContent
 
       for (let i = 0; i < keys.length - 1; i++) {
         if (!current[keys[i]]) current[keys[i]] = {}
@@ -414,6 +415,9 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           throw new Error("Arquivo muito grande. Máximo 5MB.")
         }
 
+        // Gerar chave única para a imagem
+        const imageKey = ImageStorageService.generateImageKey(contentPath, file.name)
+
         // Construct a unique storage path based on contentPath and timestamp
         const fileExt = file.name.split(".").pop()
         const sanitizedContentPath = contentPath.replace(/[^a-zA-Z0-9]/g, "_") // Sanitize for storage path
@@ -427,6 +431,24 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
         if (newImageUrl) {
           console.log("[AdminContext] uploadImage: Imagem enviada para Supabase Storage com sucesso. URL:", newImageUrl)
+          
+          // Salvar também no sistema de cache robusto
+          try {
+            const dataUrl = await ImageStorageService.fileToDataUrl(file)
+            await ImageStorageService.saveImage(imageKey, dataUrl, {
+              originalName: file.name,
+              contentPath: contentPath,
+              storagePath: storageFilePath,
+              size: file.size,
+              type: file.type,
+              uploadedAt: new Date().toISOString(),
+              finalUrl: newImageUrl
+            })
+            console.log(`[AdminContext] Imagem salva no cache: ${imageKey}`)
+          } catch (cacheError) {
+            console.warn('[AdminContext] Erro ao salvar no cache:', cacheError)
+          }
+          
           // Update content in the database with the new public URL
           // This will trigger the Realtime listener on other clients.
           await updateContent(contentPath, newImageUrl)

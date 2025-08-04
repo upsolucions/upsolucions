@@ -7,6 +7,7 @@ import { ArrowLeft, Camera, Lock, Shield, Phone, Monitor, Wifi, Wrench, Users, E
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
+import { ImageGallery } from "@/components/cliente/image-gallery"
 import { useAdmin } from "@/contexts/admin-context"
 
 export default function ServicosPage() {
@@ -23,13 +24,13 @@ export default function ServicosPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center overflow-hidden">
+              <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center overflow-hidden">
                 <EditableImage
                   path="logo"
                   src={siteContent.logo}
                   alt="Logo"
-                  width={48}
-                  height={48}
+                  width={64}
+                  height={64}
                   className="object-contain"
                 />
               </div>
@@ -115,6 +116,21 @@ export default function ServicosPage() {
         </div>
       </section>
 
+      {/* Gallery Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold mb-4 text-gray-900">Galeria de Projetos</h3>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Confira alguns dos nossos trabalhos realizados e projetos de segurança implementados
+            </p>
+          </div>
+          <div className="max-w-6xl mx-auto">
+            <ImageGallery clienteId="servicos" maxHeight={300} />
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-16 bg-slate-600 text-white">
         <div className="container mx-auto px-4 text-center">
@@ -132,13 +148,13 @@ export default function ServicosPage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-14 h-14 bg-slate-600 rounded-lg flex items-center justify-center overflow-hidden">
                   <EditableImage
                     path="logo"
                     src={siteContent.logo}
                     alt="Logo"
-                    width={40}
-                    height={40}
+                    width={53}
+                    height={53}
                     className="object-contain"
                   />
                 </div>

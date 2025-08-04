@@ -128,17 +128,48 @@ export function EditableText({
   }
 
   const Component = as
+  const isInlineElement = as === 'span' || as === 'p'
+  
+  if (isInlineElement) {
+    return (
+      <span className="relative group">
+        <Component className={className}>{value}</Component>
+        <span
+          className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-blue-500 hover:text-blue-700"
+          onClick={() => setIsEditing(true)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              setIsEditing(true)
+            }
+          }}
+          title="Clique para editar"
+        >
+          ✏️
+        </span>
+      </span>
+    )
+  }
+  
   return (
     <div className="relative group inline-block">
       <Component className={className}>{value}</Component>
-      <Button
-        size="sm"
-        variant="outline"
-        className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 hover:bg-white text-xs px-2 py-1"
+      <div
+        className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 hover:bg-white text-xs px-2 py-1 border border-gray-200 rounded cursor-pointer flex items-center justify-center"
         onClick={() => setIsEditing(true)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setIsEditing(true)
+          }
+        }}
       >
         <Edit className="w-3 h-3" />
-      </Button>
+      </div>
     </div>
   )
 }
