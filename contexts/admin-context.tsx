@@ -23,6 +23,7 @@ const defaultContent = {
   siteName: "Up Solicions",
   slogan: "Segurança Tecnológica",
   logo: "/up-solucions-logo.svg",
+  backgrounds: {},
   hero: {
     title: "Segurança Tecnológica Profissional",
     subtitle:

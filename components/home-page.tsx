@@ -9,7 +9,9 @@ import { Shield, Camera, Lock, Phone, Zap, Droplets, Car } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
+import { BackgroundCustomizer } from "@/components/admin/background-customizer"
 import { useAdmin } from "@/contexts/admin-context"
+import { useBackground } from "@/hooks/use-background"
 
 // Memoized components for better performance
 const ServiceCard = memo(({ service, index, Icon }: { service: any; index: number; Icon: any }) => (
@@ -70,7 +72,16 @@ const FAQItem = memo(({ faq, index }: { faq: any; index: number }) => (
 ))
 
 export const HomePage = memo(() => {
-  const { siteContent } = useAdmin()
+  const { siteContent, isAdmin } = useAdmin()
+  
+  // Background hooks
+  const headerBg = useBackground('header')
+  const heroBg = useBackground('hero')
+  const servicesBg = useBackground('services')
+  const solutionsBg = useBackground('solutions')
+  const faqBg = useBackground('faq')
+  const ctaBg = useBackground('cta')
+  const footerBg = useBackground('footer')
 
   // Memoized data
   const services = siteContent.services.items.slice(0, 4)
@@ -81,19 +92,20 @@ export const HomePage = memo(() => {
   return (
     <div className="min-h-screen bg-white">
       <AdminLogin />
+      {isAdmin && <BackgroundCustomizer sectionId="header" />}
 
       {/* Header */}
-      <header className="bg-slate-600 text-white shadow-lg">
+      <header className="bg-slate-600 text-white shadow-lg" style={headerBg}>
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center overflow-hidden">
+              <div className="w-24 h-24 bg-white rounded-lg flex items-center justify-center overflow-hidden">
                 <EditableImage
                   path="logo"
                   src={siteContent.logo}
                   alt="Logo"
-                  width={69}
-                  height={69}
+                  width={83}
+                  height={83}
                   className="object-contain"
                 />
               </div>
@@ -119,9 +131,6 @@ export const HomePage = memo(() => {
               <Link href="/orcamento" className="hover:text-slate-200 transition-colors">
                 Orçamento
               </Link>
-              <Link href="/cliente" className="hover:text-slate-200 transition-colors">
-                Área do Cliente
-              </Link>
               <Link href="#contato" className="hover:text-slate-200 transition-colors">
                 Contato
               </Link>
@@ -131,7 +140,7 @@ export const HomePage = memo(() => {
       </header>
 
       {/* Hero */}
-      <section className="bg-gradient-to-r from-slate-600 to-slate-500 text-white py-20">
+      <section className="bg-gradient-to-r from-slate-600 to-slate-500 text-white py-20" style={heroBg}>
         <div className="container mx-auto px-4 text-center">
           <EditableText path="hero.title" value={siteContent.hero.title} as="h2" className="text-5xl font-bold mb-6" />
           <EditableText
@@ -158,7 +167,7 @@ export const HomePage = memo(() => {
       </section>
 
       {/* Services */}
-      <section id="servicos" className="py-16 bg-gray-50">
+      <section id="servicos" className="py-16 bg-gray-50" style={servicesBg}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <EditableText
@@ -191,7 +200,7 @@ export const HomePage = memo(() => {
       </section>
 
       {/* Solutions */}
-      <section id="solucoes" className="py-16">
+      <section id="solucoes" className="py-16" style={solutionsBg}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <EditableText
@@ -224,7 +233,7 @@ export const HomePage = memo(() => {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-16 bg-gray-50">
+      <section id="faq" className="py-16 bg-gray-50" style={faqBg}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">Perguntas Frequentes</h3>
@@ -242,7 +251,7 @@ export const HomePage = memo(() => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-slate-600 text-white">
+      <section className="py-16 bg-slate-600 text-white" style={ctaBg}>
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-bold mb-4">Pronto para Proteger seu Patrimônio?</h3>
           <p className="text-xl mb-8">Entre em contato conosco e solicite seu orçamento gratuito</p>
@@ -263,7 +272,7 @@ export const HomePage = memo(() => {
       </section>
 
       {/* Footer */}
-      <footer id="contato" className="bg-gray-900 text-white py-12">
+      <footer id="contato" className="bg-gray-900 text-white py-12" style={footerBg}>
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
