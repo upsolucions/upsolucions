@@ -20,9 +20,9 @@ Site institucional da Up Solucions desenvolvido com Next.js 14, TypeScript e Tai
 2. **Configurar Variáveis de Ambiente**:
    No painel do Vercel, adicione as seguintes variáveis:
    ```
-   NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anon_do_supabase
-   SUPABASE_SERVICE_ROLE_KEY=sua_chave_service_role
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+    SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
    NEXT_TELEMETRY_DISABLED=1
    NODE_OPTIONS=--max-old-space-size=4096
    ```
