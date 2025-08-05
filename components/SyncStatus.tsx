@@ -76,43 +76,16 @@ export default function SyncStatus({ className = '' }: SyncStatusProps) {
   if (!isVisible) return null
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 ${className}`}>
-      <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-3 max-w-sm">
-        <div className="flex items-center space-x-3">
-          {/* Indicador de status */}
-          <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${getStatusColor()} animate-pulse`}></div>
-            <span className="text-sm font-medium text-gray-700">
-              {getStatusText()}
-            </span>
-          </div>
-
-          {/* Botão de sincronização manual */}
-          {syncStatus.isOnline && syncStatus.isSupabaseConfigured && (
-            <button
-              onClick={handleForceSync}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-              title="Forçar sincronização"
-            >
-              ↻
-            </button>
-          )}
-        </div>
-
-        {/* Descrição detalhada */}
-        <p className="text-xs text-gray-500 mt-2">
-          {getStatusDescription()}
-        </p>
-
-        {/* Informações adicionais para desenvolvedores */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mt-2 pt-2 border-t border-gray-100">
-            <div className="text-xs text-gray-400 space-y-1">
-              <div>Online: {syncStatus.isOnline ? '✓' : '✗'}</div>
-              <div>Supabase: {syncStatus.isSupabaseConfigured ? '✓' : '✗'}</div>
-              <div>Pendente: {syncStatus.hasPendingChanges ? '✓' : '✗'}</div>
-            </div>
-          </div>
+    <div className={`fixed bottom-4 left-4 z-40 ${className}`}>
+      {/* Apenas uma bolinha simples */}
+      <div 
+        className={`w-4 h-4 rounded-full ${getStatusColor()} shadow-lg cursor-pointer transition-all duration-300 hover:scale-110`}
+        title={getStatusDescription()}
+        onClick={syncStatus.isOnline && syncStatus.isSupabaseConfigured ? handleForceSync : undefined}
+      >
+        {/* Animação de pulso apenas quando sincronizando */}
+        {syncStatus.hasPendingChanges && (
+          <div className={`w-4 h-4 rounded-full ${getStatusColor()} animate-ping absolute`}></div>
         )}
       </div>
     </div>
