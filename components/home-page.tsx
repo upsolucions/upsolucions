@@ -87,13 +87,13 @@ export const HomePage = memo(() => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center overflow-hidden">
+              <div className="w-18 h-18 bg-white rounded-lg flex items-center justify-center overflow-hidden">
                 <EditableImage
                   path="logo"
                   src={siteContent.logo}
                   alt="Logo"
-                  width={53}
-                  height={53}
+                  width={69}
+                  height={69}
                   className="object-contain"
                 />
               </div>
