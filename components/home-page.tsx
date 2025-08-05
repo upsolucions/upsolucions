@@ -75,7 +75,7 @@ export const HomePage = memo(() => {
   const { siteContent, isAdmin } = useAdmin()
   
   // Background hooks
-  const BackgroundContainer = useAdvancedBackground()
+  const BackgroundContainer = useAdvancedBackground('global')
 
   // Memoized data
   const services = siteContent.services.items.slice(0, 4)
@@ -84,8 +84,7 @@ export const HomePage = memo(() => {
   const solutionIcons = [Zap, Droplets, Car]
 
   return (
-    <BackgroundContainer>
-      <div className="min-h-screen bg-white">
+    <BackgroundContainer className="min-h-screen bg-white">
         <AdminLogin />
         {isAdmin && <AdvancedBackgroundCustomizer />}
 
@@ -344,7 +343,6 @@ export const HomePage = memo(() => {
           </div>
           </div>
         </footer>
-      </div>
     </BackgroundContainer>
   )
 })

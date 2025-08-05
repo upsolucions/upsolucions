@@ -2,6 +2,7 @@
 
 import { useAdmin } from "@/contexts/admin-context"
 import { useEffect, useState } from "react"
+import React from "react"
 
 interface BackgroundConfig {
   type: 'color' | 'image'
@@ -106,7 +107,7 @@ export function useBackgroundClass(sectionId: string): string {
 }
 
 // Hook para renderizar o container com fundo e imagens
-export function useAdvancedBackground(sectionId: string) {
+export function useAdvancedBackground(sectionId: string = 'global') {
   const { backgroundStyle, floatingImages } = useBackground(sectionId)
   
   const BackgroundContainer = ({ children, className = "", ...props }: any) => (
@@ -120,5 +121,5 @@ export function useAdvancedBackground(sectionId: string) {
     </div>
   )
   
-  return { BackgroundContainer, backgroundStyle, floatingImages }
+  return BackgroundContainer
 }
