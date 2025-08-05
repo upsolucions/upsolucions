@@ -7,7 +7,7 @@ import { ArrowLeft, Camera, Lock, Shield, Phone, Monitor, Wifi, Wrench, Users, E
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
-import { ImageGallery } from "@/components/cliente/image-gallery"
+
 import { useAdmin } from "@/contexts/admin-context"
 
 export default function ServicosPage() {
@@ -126,7 +126,7 @@ export default function ServicosPage() {
             </p>
           </div>
           <div className="max-w-6xl mx-auto">
-            <ImageGallery clienteId="servicos" maxHeight={300} />
+            <p className="text-center text-gray-500">Galeria em desenvolvimento</p>
           </div>
         </div>
       </section>

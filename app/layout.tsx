@@ -8,9 +8,7 @@ import "./globals.css"
 const AdminProvider = dynamic(() => import("@/contexts/admin-context").then(mod => ({ default: mod.AdminProvider })), {
   ssr: true,
 })
-const ClienteProvider = dynamic(() => import("@/contexts/cliente-context").then(mod => ({ default: mod.ClienteProvider })), {
-  ssr: true,
-})
+
 const SyncStatus = dynamic(() => import("@/components/SyncStatus"), {
   ssr: false,
 })
@@ -59,10 +57,8 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <AdminProvider>
-          <ClienteProvider>
-            {children}
-            <SyncStatus />
-          </ClienteProvider>
+          {children}
+          <SyncStatus />
         </AdminProvider>
       </body>
     </html>
