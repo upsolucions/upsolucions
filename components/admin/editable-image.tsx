@@ -8,6 +8,7 @@ import { Upload, Loader2, AlertCircle, RefreshCw, X } from "lucide-react"
 import { LazyImage } from "@/components/ui/lazy-image"
 import { useAdmin } from "@/contexts/admin-context"
 import { useUploadedImage } from "@/hooks/use-image-loader"
+import { LogoUpload } from "@/components/admin/logo-upload"
 
 interface EditableImageProps {
   path: string
@@ -23,6 +24,7 @@ export function EditableImage({ path, src, alt, width, height, className = "", f
   const { isAdmin, uploadImage, updateContent } = useAdmin()
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const [showLogoUpload, setShowLogoUpload] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   // Usar o hook robusto para carregamento de imagens
@@ -96,6 +98,13 @@ export function EditableImage({ path, src, alt, width, height, className = "", f
     reloadImage()
   }
 
+  const handleLogoUploadComplete = () => {
+    setShowLogoUpload(false)
+  }
+
+  // Verificar se é o logo para usar o componente especializado
+  const isLogo = path === 'logo'
+
   // Determinar qual src usar e estados
   const displaySrc = imageSrc || src || ''
   const hasImage = Boolean(displaySrc && displaySrc !== '')
@@ -138,9 +147,15 @@ export function EditableImage({ path, src, alt, width, height, className = "", f
           <Button 
             variant="secondary" 
             size="sm" 
-            onClick={() => fileInputRef.current?.click()} 
+            onClick={() => {
+              if (isLogo) {
+                setShowLogoUpload(true)
+              } else {
+                fileInputRef.current?.click()
+              }
+            }} 
             disabled={showLoading}
-            title="Upload nova imagem"
+            title={isLogo ? "Upload Logo" : "Upload nova imagem"}
           >
             <Upload className="h-4 w-4" />
           </Button>
@@ -169,13 +184,15 @@ export function EditableImage({ path, src, alt, width, height, className = "", f
             </Button>
           )}
           
-          <input 
-            type="file" 
-            accept="image/*" 
-            ref={fileInputRef} 
-            onChange={handleImageUpload} 
-            className="hidden" 
-          />
+          {!isLogo && (
+            <input 
+              type="file" 
+              accept="image/*" 
+              ref={fileInputRef} 
+              onChange={handleImageUpload} 
+              className="hidden" 
+            />
+          )}
         </div>
       )}
       
@@ -198,7 +215,13 @@ export function EditableImage({ path, src, alt, width, height, className = "", f
         </div>
       )}
       
-
+      {/* Modal de upload de logo */}
+      {showLogoUpload && (
+        <LogoUpload
+          onClose={() => setShowLogoUpload(false)}
+          onUploadComplete={handleLogoUploadComplete}
+        />
+      )}
     </div>
   )
 }

@@ -9,9 +9,9 @@ import { Shield, Camera, Lock, Phone, Zap, Droplets, Car } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
-import { BackgroundCustomizer } from "@/components/admin/background-customizer"
+import { AdvancedBackgroundCustomizer } from "@/components/admin/advanced-background-customizer"
 import { useAdmin } from "@/contexts/admin-context"
-import { useBackground } from "@/hooks/use-background"
+import { useAdvancedBackground } from "@/hooks/use-background"
 
 // Memoized components for better performance
 const ServiceCard = memo(({ service, index, Icon }: { service: any; index: number; Icon: any }) => (
@@ -75,13 +75,7 @@ export const HomePage = memo(() => {
   const { siteContent, isAdmin } = useAdmin()
   
   // Background hooks
-  const headerBg = useBackground('header')
-  const heroBg = useBackground('hero')
-  const servicesBg = useBackground('services')
-  const solutionsBg = useBackground('solutions')
-  const faqBg = useBackground('faq')
-  const ctaBg = useBackground('cta')
-  const footerBg = useBackground('footer')
+  const BackgroundContainer = useAdvancedBackground()
 
   // Memoized data
   const services = siteContent.services.items.slice(0, 4)
@@ -90,12 +84,13 @@ export const HomePage = memo(() => {
   const solutionIcons = [Zap, Droplets, Car]
 
   return (
-    <div className="min-h-screen bg-white">
-      <AdminLogin />
-      {isAdmin && <BackgroundCustomizer sectionId="header" />}
+    <BackgroundContainer>
+      <div className="min-h-screen bg-white">
+        <AdminLogin />
+        {isAdmin && <AdvancedBackgroundCustomizer />}
 
-      {/* Header */}
-      <header className="bg-slate-600 text-white shadow-lg" style={headerBg}>
+        {/* Header */}
+        <header className="bg-slate-600 text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -139,8 +134,8 @@ export const HomePage = memo(() => {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="bg-gradient-to-r from-slate-600 to-slate-500 text-white py-20" style={heroBg}>
+        {/* Hero */}
+        <section className="bg-gradient-to-r from-slate-600 to-slate-500 text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <EditableText path="hero.title" value={siteContent.hero.title} as="h2" className="text-5xl font-bold mb-6" />
           <EditableText
@@ -166,8 +161,8 @@ export const HomePage = memo(() => {
         </div>
       </section>
 
-      {/* Services */}
-      <section id="servicos" className="py-16 bg-gray-50" style={servicesBg}>
+        {/* Services */}
+        <section id="servicos" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <EditableText
@@ -199,8 +194,8 @@ export const HomePage = memo(() => {
         </div>
       </section>
 
-      {/* Solutions */}
-      <section id="solucoes" className="py-16" style={solutionsBg}>
+        {/* Solutions */}
+        <section id="solucoes" className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <EditableText
@@ -232,8 +227,8 @@ export const HomePage = memo(() => {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="py-16 bg-gray-50" style={faqBg}>
+        {/* FAQ */}
+        <section id="faq" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">Perguntas Frequentes</h3>
@@ -250,8 +245,8 @@ export const HomePage = memo(() => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 bg-slate-600 text-white" style={ctaBg}>
+        {/* CTA */}
+        <section className="py-16 bg-slate-600 text-white">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-bold mb-4">Pronto para Proteger seu Patrimônio?</h3>
           <p className="text-xl mb-8">Entre em contato conosco e solicite seu orçamento gratuito</p>
@@ -271,8 +266,8 @@ export const HomePage = memo(() => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer id="contato" className="bg-gray-900 text-white py-12" style={footerBg}>
+        {/* Footer */}
+        <footer id="contato" className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
@@ -347,9 +342,10 @@ export const HomePage = memo(() => {
             &copy; 2024&nbsp;
             <EditableText path="siteName" value={siteContent.siteName} />. Todos os direitos reservados.
           </div>
-        </div>
-      </footer>
-    </div>
+          </div>
+        </footer>
+      </div>
+    </BackgroundContainer>
   )
 })
 

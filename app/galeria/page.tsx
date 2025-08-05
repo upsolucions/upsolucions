@@ -16,50 +16,17 @@ export default function GaleriaPage() {
   const { siteContent, isAdmin, updateContent, uploadImage } = useAdmin()
   const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string; title: string } | null>(null)
   const [mounted, setMounted] = useState(false)
-  const [showUploadModal, setShowUploadModal] = useState(false)
+  const [showUpload, setShowUpload] = useState(false)
+  const [uploadType, setUploadType] = useState<'main' | 'sub'>('main')
   const [imageLoadErrors, setImageLoadErrors] = useState<{ [key: string]: boolean }>({})
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const addNewMainImage = async (file: File, title: string, alt: string) => {
-    // The path for the image in storage should be unique, but also reflect its place in content.
-    // useAdmin().uploadImage now handles generating the unique storage path.
-    const imageUrl = await uploadImage(`gallery.mainImages.${siteContent?.gallery?.mainImages?.length || 0}`, file)
-    if (imageUrl) {
-      const newImage = {
-        src: imageUrl, // This is the persistent URL from Supabase Storage
-        title: title || `Projeto ${(siteContent?.gallery?.mainImages?.length || 0) + 1}`,
-        alt: alt || `Descrição do projeto ${(siteContent?.gallery?.mainImages?.length || 0) + 1}`,
-      }
-      const currentImages = siteContent?.gallery?.mainImages || []
-      const updatedImages = [...currentImages, newImage]
-      await updateContent("gallery.mainImages", updatedImages) // Update content with the new image object
-      setShowUploadModal(false)
-      setImageLoadErrors({})
-    } else {
-      console.error("Failed to upload main image to Supabase. Image will not be added.")
-      // Optionally, show an error message to the user here
-    }
-  }
-
-  const addNewSubImage = async (file: File, title: string, alt: string) => {
-    const imageUrl = await uploadImage(`gallery.subGallery.${siteContent?.gallery?.subGallery?.length || 0}`, file)
-    if (imageUrl) {
-      const newImage = {
-        src: imageUrl,
-        title: title || `Projeto ${(siteContent?.gallery?.subGallery?.length || 0) + 1}`,
-        alt: alt || `Descrição do projeto ${(siteContent?.gallery?.subGallery?.length || 0) + 1}`,
-      }
-      const currentImages = siteContent?.gallery?.subGallery || []
-      const updatedImages = [...currentImages, newImage]
-      await updateContent("gallery.subGallery", updatedImages)
-      setImageLoadErrors({})
-    } else {
-      console.error("Failed to upload sub image to Supabase. Image will not be added.")
-      // Optionally, show an error message to the user here
-    }
+  const handleUploadComplete = () => {
+    setShowUpload(false)
+    // O componente GalleryUpload já atualiza o conteúdo automaticamente
   }
 
   const removeMainImage = async (index: number) => {
@@ -167,32 +134,26 @@ export default function GaleriaPage() {
         <section className="py-4 bg-blue-50 border-b">
           <div className="container mx-auto px-4">
             <div className="flex flex-wrap gap-4 justify-center">
-              <Button onClick={() => setShowUploadModal(true)} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Adicionar Foto Principal
-              </Button>
-              <Button
+              <Button 
                 onClick={() => {
-                  const input = document.createElement("input")
-                  input.type = "file"
-                  input.accept = "image/*"
-                  input.multiple = true
-                  input.onchange = async (e) => {
-                    const files = (e.target as HTMLInputElement).files
-                    if (files) {
-                      for (let i = 0; i < files.length; i++) {
-                        const file = files[i]
-                        await addNewSubImage(file, file.name.split(".")[0], `Projeto ${file.name}`)
-                      }
-                    }
-                  }
-                  input.click()
+                  setUploadType('main')
+                  setShowUpload(true)
+                }}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Múltiplo - Galeria Principal
+              </Button>
+              <Button 
+                onClick={() => {
+                  setUploadType('sub')
+                  setShowUpload(true)
                 }}
                 variant="outline"
                 className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                Upload Múltiplas Fotos
+                Upload Múltiplo - Galeria Secundária
               </Button>
             </div>
           </div>
@@ -424,8 +385,12 @@ export default function GaleriaPage() {
       )}
 
       {/* Upload Modal */}
-      {showUploadModal && (
-        <GalleryUpload isOpen={showUploadModal} onClose={() => setShowUploadModal(false)} onUpload={addNewMainImage} />
+      {showUpload && (
+        <GalleryUpload
+          onClose={() => setShowUpload(false)}
+          onUploadComplete={handleUploadComplete}
+          galleryType={uploadType}
+        />
       )}
     </div>
   )
