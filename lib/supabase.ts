@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js"
 import { ImageStorageService } from './image-storage'
+import { SyncService } from './sync-service'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://localhost:54321"
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "demo-key"
@@ -17,73 +18,27 @@ export interface SiteContent {
 
 export const siteContentService = {
   async getSiteContent(): Promise<any> {
-    // Em modo de desenvolvimento sem Supabase configurado, retornar null silenciosamente
-    if (isDevMode) {
-      console.log("[siteContentService] Modo desenvolvimento - Supabase não configurado")
-      return null
-    }
-    
-    console.log("[siteContentService] getSiteContent: Tentando buscar conteúdo do Supabase.")
+    console.log("[siteContentService] getSiteContent: Buscando conteúdo...")
     try {
-      const { data, error } = await supabase.from("site_content").select("content").eq("id", "main").single()
-
-      if (error) {
-        if (error.code === "42P01" || error.message?.includes("does not exist")) {
-          console.warn(
-            "[siteContentService] Tabela site_content ainda não existe. Use o script SQL ou a UI do Supabase para criá-la.",
-          )
-          return null
-        }
-        if (error.code === "PGRST116") {
-          // No rows returned - this is normal for first time
-          console.log("[siteContentService] Nenhuma linha encontrada para 'main' na tabela site_content.")
-          return null
-        }
-        console.error("[siteContentService] Erro ao buscar conteúdo:", error)
-        return null
-      }
-      console.log("[siteContentService] Conteúdo buscado com sucesso:", data?.content)
-      return data?.content || null
+      // Usar o novo sistema de sincronização
+      const content = await SyncService.getContent()
+      console.log("[siteContentService] Conteúdo recuperado:", content ? "Encontrado" : "Não encontrado")
+      return content
     } catch (error) {
-      console.error("[siteContentService] Erro em getSiteContent (catch):", error)
+      console.error("[siteContentService] Erro em getSiteContent:", error)
       return null
     }
   },
 
   async updateSiteContent(content: any): Promise<boolean> {
-    // Em modo de desenvolvimento sem Supabase configurado, simular sucesso
-    if (isDevMode) {
-      console.log("[siteContentService] Modo desenvolvimento - Simulando atualização de conteúdo")
-      return true
-    }
-    
-    console.log("[siteContentService] updateSiteContent: Tentando atualizar conteúdo no Supabase.", content)
+    console.log("[siteContentService] updateSiteContent: Salvando conteúdo...", content)
     try {
-      const { error } = await supabase.from("site_content").upsert(
-        {
-          id: "main",
-          content,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: "id",
-        },
-      )
-
-      if (error) {
-        if (error.code === "42P01" || error.message?.includes("does not exist")) {
-          console.warn(
-            "[siteContentService] Tabela site_content ainda não existe. Alterações serão mantidas apenas no navegador.",
-          )
-          return false
-        }
-        console.error("[siteContentService] Erro ao atualizar conteúdo:", error)
-        return false
-      }
-      console.log("[siteContentService] Conteúdo atualizado com sucesso no Supabase.")
-      return true
+      // Usar o novo sistema de sincronização
+      const success = await SyncService.saveContentLocally(content)
+      console.log("[siteContentService] Conteúdo salvo:", success ? "Sucesso" : "Falha")
+      return success
     } catch (error) {
-      console.error("[siteContentService] Erro em updateSiteContent (catch):", error)
+      console.error("[siteContentService] Erro em updateSiteContent:", error)
       return false
     }
   },

@@ -11,6 +11,9 @@ const AdminProvider = dynamic(() => import("@/contexts/admin-context").then(mod 
 const ClienteProvider = dynamic(() => import("@/contexts/cliente-context").then(mod => ({ default: mod.ClienteProvider })), {
   ssr: true,
 })
+const SyncStatus = dynamic(() => import("@/components/SyncStatus"), {
+  ssr: false,
+})
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,6 +61,7 @@ export default function RootLayout({
         <AdminProvider>
           <ClienteProvider>
             {children}
+            <SyncStatus />
           </ClienteProvider>
         </AdminProvider>
       </body>
