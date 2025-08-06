@@ -111,6 +111,8 @@ export function EditableImage({ path, src, alt, width, height, className = "", f
   const showLoading = isUploading || isLoadingImage || isLoadingCache
   const showError = uploadError || imageError
 
+
+
   return (
     <div className={`relative group ${className}`}>
       <div className="relative">
