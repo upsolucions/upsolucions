@@ -9,7 +9,7 @@ import { Shield, Camera, Lock, Phone, Zap, Droplets, Car } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
-import { WixStyleBackgroundCustomizer } from "@/components/admin/wix-style-background-customizer"
+import { AdvancedBackgroundCustomizer } from "@/components/admin/advanced-background-customizer"
 import { useAdmin } from "@/contexts/admin-context"
 import { useAdvancedBackground } from "@/hooks/use-background"
 
@@ -86,7 +86,7 @@ export const HomePage = memo(() => {
   return (
     <BackgroundContainer className="min-h-screen bg-white">
         <AdminLogin />
-        {isAdmin && <WixStyleBackgroundCustomizer sectionId="global" />}
+        {isAdmin && <AdvancedBackgroundCustomizer sectionId="global" />}
 
         {/* Header */}
         <header className="bg-slate-600 text-white shadow-lg">
