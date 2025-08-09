@@ -310,8 +310,8 @@ export default function GaleriaPage() {
                 <div className="w-11 h-11 bg-purple-600 rounded-lg flex items-center justify-center overflow-hidden">
                   <EditableImage
                     path="logo"
-                    src={siteContent?.logo || "/placeholder-logo.svg"
-                    alt="Logo"
+                    src={siteContent?.logo || "/placeholder-logo.svg"}
+                    alt="Logo"/>
                     width={44}
                     height={44}
                     className="object-contain"

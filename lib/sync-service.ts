@@ -106,7 +106,7 @@ export class SyncService {
       return data.content
     } catch (error) {
       // Não logar erro se for problema de configuração
-      if (error.code === 'PGRST205') {
+      if ((error as { code?: string }).code === 'PGRST205') {
         console.log('[SyncService] Supabase não configurado corretamente')
       } else {
         console.error('[SyncService] Erro ao buscar conteúdo da nuvem:', error)
