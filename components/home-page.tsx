@@ -9,10 +9,8 @@ import { Shield, Camera, Lock, Phone, Zap, Droplets, Car } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
-import { AdvancedBackgroundCustomizer } from "@/components/admin/advanced-background-customizer"
-
+// Customização de páginas removida por problemas de funcionamento
 import { useAdmin } from "@/contexts/admin-context"
-import { useAdvancedBackground } from "@/hooks/use-background"
 
 // Memoized components for better performance
 const ServiceCard = memo(({ service, index, Icon }: { service: any; index: number; Icon: any }) => (
@@ -75,8 +73,7 @@ const FAQItem = memo(({ faq, index }: { faq: any; index: number }) => (
 export const HomePage = memo(() => {
   const { siteContent, isAdmin } = useAdmin()
   
-  // Background hooks
-  const BackgroundContainer = useAdvancedBackground('global')
+  // BackgroundContainer removido
 
   // Memoized data
   const services = siteContent.services.items.slice(0, 4)
@@ -85,9 +82,8 @@ export const HomePage = memo(() => {
   const solutionIcons = [Zap, Droplets, Car]
 
   return (
-    <BackgroundContainer className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white">
         <AdminLogin />
-        {isAdmin && <AdvancedBackgroundCustomizer sectionId="global" />}
         
 
         {/* Header */}
@@ -345,7 +341,7 @@ export const HomePage = memo(() => {
           </div>
           </div>
         </footer>
-    </BackgroundContainer>
+    </div>
   )
 })
 
