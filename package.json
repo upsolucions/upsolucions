@@ -6,7 +6,13 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "deploy": "node scripts/auto-deploy.js",
+    "deploy:prod": "npm run deploy -- --prod",
+    "deploy:preview": "npm run deploy -- --preview",
+    "git:push": "git add . && git commit -m \"feat: auto deploy\" && git push origin main",
+    "vercel:deploy": "vercel --prod",
+    "full-deploy": "npm run git:push && npm run vercel:deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

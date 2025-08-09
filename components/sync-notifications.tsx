@@ -16,11 +16,6 @@ export function SyncNotifications() {
   const [toasts, setToasts] = useState<Toast[]>([])
   const [previousStatus, setPreviousStatus] = useState(syncStatus)
 
-  // Só mostrar para admins
-  if (!isAdmin) {
-    return null
-  }
-
   useEffect(() => {
     // Detectar mudanças de status e mostrar notificações apropriadas
     if (previousStatus !== syncStatus) {
@@ -115,6 +110,11 @@ export function SyncNotifications() {
       default:
         return '•'
     }
+  }
+
+  // Só mostrar para admins
+  if (!isAdmin) {
+    return null
   }
 
   if (toasts.length === 0) {

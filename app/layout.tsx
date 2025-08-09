@@ -70,9 +70,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AdminProvider>
           {children}
-          <SyncStatus />
           <SyncDiagnostics />
-          <SyncStatusIndicator />
           <SyncNotifications />
         </AdminProvider>
       </body>
