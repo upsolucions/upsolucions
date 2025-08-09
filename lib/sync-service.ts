@@ -95,13 +95,22 @@ export class SyncService {
           console.log('[SyncService] Nenhum conteúdo encontrado na nuvem')
           return null
         }
+        if (error.code === 'PGRST205') {
+          console.log('[SyncService] Tabela site_content não encontrada - Supabase não configurado')
+          return null
+        }
         throw error
       }
 
       console.log('[SyncService] Conteúdo recuperado da nuvem')
       return data.content
     } catch (error) {
-      console.error('[SyncService] Erro ao buscar conteúdo da nuvem:', error)
+      // Não logar erro se for problema de configuração
+      if (error.code === 'PGRST205') {
+        console.log('[SyncService] Supabase não configurado corretamente')
+      } else {
+        console.error('[SyncService] Erro ao buscar conteúdo da nuvem:', error)
+      }
       return null
     }
   }

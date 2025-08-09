@@ -18,7 +18,7 @@ interface ImageState {
 
 export function useImageLoader(initialSrc: string | null, options: UseImageLoaderOptions = {}) {
   const {
-    fallbackUrl = '/placeholder.svg?height=200&width=300&text=Imagem',
+    fallbackUrl = '/placeholder-200x300.svg',
     retryAttempts = 3,
     retryDelay = 1000
   } = options

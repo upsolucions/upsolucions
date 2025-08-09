@@ -76,7 +76,7 @@ export default function GaleriaPage() {
               <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center overflow-hidden">
                 <EditableImage
                   path="logo"
-                  src={siteContent?.logo || "/placeholder.svg?height=53&width=53&text=Logo"}
+                  src={siteContent?.logo || "/placeholder-logo.svg"}
                   alt="Logo"
                   width={53}
                   height={53}
@@ -167,7 +167,7 @@ export default function GaleriaPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {siteContent?.gallery?.mainImages?.map((image: any, index: number) => {
               const imageKey = `main-${index}`
-              const imageSrc = image?.src || `/placeholder.svg?height=400&width=600&text=Projeto+${index + 1}`
+              const imageSrc = image?.src || "/placeholder.svg"
 
               return (
                 <Card
@@ -236,7 +236,7 @@ export default function GaleriaPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {siteContent?.gallery?.subGallery?.map((image: any, index: number) => {
               const imageKey = `sub-${index}`
-              const imageSrc = image?.src || `/placeholder.svg?height=300&width=400&text=Foto+${index + 1}`
+              const imageSrc = image?.src || "/placeholder.svg"
 
               return (
                 <Card
@@ -310,7 +310,7 @@ export default function GaleriaPage() {
                 <div className="w-11 h-11 bg-purple-600 rounded-lg flex items-center justify-center overflow-hidden">
                   <EditableImage
                     path="logo"
-                    src={siteContent?.logo || "/placeholder.svg?height=44&width=44&text=Logo"}
+                    src={siteContent?.logo || "/placeholder-logo.svg"
                     alt="Logo"
                     width={44}
                     height={44}

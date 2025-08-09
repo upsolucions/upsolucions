@@ -38,84 +38,84 @@ const defaultContent = {
         description: "Sistemas de videomonitoramento profissionais",
         fullDescription:
           "Sistemas completos de videomonitoramento com câmeras HD, 4K e visão noturna. Instalação profissional e manutenção preventiva.",
-        image: "/placeholder.svg?height=200&width=300&text=Câmeras",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Controle de Acesso",
         description: "Soluções seguras para controle de entrada",
         fullDescription:
           "Sistemas eletrônicos para controle de entrada e saída com cartões, senhas e biometria. Ideal para empresas e condomínios.",
-        image: "/placeholder.svg?height=200&width=300&text=Controle+de+Acesso",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Alarmes",
         description: "Sistemas de alarme residencial e comercial",
         fullDescription:
           "Sistemas de alarme residencial e comercial com sensores de movimento, abertura e sirenes. Monitoramento 24h disponível.",
-        image: "/placeholder.svg?height=200&width=300&text=Alarmes",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Interfones",
         description: "Comunicação segura e eficiente",
         fullDescription:
           "Interfones residenciais e prediais com vídeo e áudio. Modelos com abertura remota e integração com smartphones.",
-        image: "/placeholder.svg?height=200&width=300&text=Interfones",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Totens de Autoatendimento",
         description: "Soluções interativas para empresas",
         fullDescription:
           "Totens interativos para autoatendimento em empresas, bancos e estabelecimentos comerciais. Soluções personalizadas.",
-        image: "/placeholder.svg?height=200&width=300&text=Totens",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Portaria Remota",
         description: "Monitoramento profissional 24h",
         fullDescription:
           "Serviços de portaria virtual com monitoramento remoto 24h. Atendimento profissional e controle de acesso à distância.",
-        image: "/placeholder.svg?height=200&width=300&text=Portaria+Remota",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Cancelas",
         description: "Controle automático de veículos",
         fullDescription:
           "Cancelas automáticas para controle de veículos em estacionamentos, condomínios e empresas. Modelos eletrônicos e hidráulicos.",
-        image: "/placeholder.svg?height=200&width=300&text=Cancelas",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Portões Automáticos",
         description: "Automatização de portões",
         fullDescription:
           "Automatização de portões residenciais e industriais. Motores, controles remotos e sistemas de segurança integrados.",
-        image: "/placeholder.svg?height=200&width=300&text=Portões",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Leitoras Facial",
         description: "Reconhecimento facial avançado",
         fullDescription:
           "Sistemas de reconhecimento facial para controle de acesso. Tecnologia avançada com alta precisão e velocidade.",
-        image: "/placeholder.svg?height=200&width=300&text=Reconhecimento+Facial",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Rede Estruturada (CPD)",
         description: "Infraestrutura de rede completa",
         fullDescription:
           "Projeto e instalação de redes estruturadas, cabeamento, racks e CPDs. Infraestrutura completa para sua empresa.",
-        image: "/placeholder.svg?height=200&width=300&text=Rede+Estruturada",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Manutenção de Computadores",
         description: "Suporte técnico especializado",
         fullDescription:
           "Serviços de manutenção preventiva e corretiva em computadores, notebooks e equipamentos de informática.",
-        image: "/placeholder.svg?height=200&width=300&text=Manutenção",
+        image: "/placeholder-200x300.svg",
       },
       {
         title: "Catracas e Torniquetes",
         description: "Controle de fluxo de pessoas",
         fullDescription:
           "Catracas eletrônicas e torniquetes para controle de fluxo de pessoas. Ideais para empresas, academias e eventos.",
-        image: "/placeholder.svg?height=200&width=300&text=Catracas",
+        image: "/placeholder-200x300.svg",
       },
     ],
   },
@@ -135,7 +135,7 @@ const defaultContent = {
           "Economia de energia",
           "Integração com assistentes virtuais",
         ],
-        image: "/placeholder.svg?height=300&width=400&text=Automação+Elétrica",
+        image: "/placeholder.svg",
       },
       {
         title: "Automações de Bombas d'água",
@@ -149,7 +149,7 @@ const defaultContent = {
           "Economia de água e energia",
           "Alertas via smartphone",
         ],
-        image: "/placeholder.svg?height=300&width=400&text=Bombas+Água",
+        image: "/placeholder.svg",
       },
       {
         title: "Instalação de Fonte para Carros Elétricos",
@@ -163,7 +163,7 @@ const defaultContent = {
           "Compatível com todos os modelos",
           "Monitoramento de consumo",
         ],
-        image: "/placeholder.svg?height=300&width=400&text=Carros+Elétricos",
+        image: "/placeholder.svg",
       },
     ],
   },
@@ -194,38 +194,38 @@ const defaultContent = {
     subtitle: "Conheça alguns dos nossos trabalhos realizados com excelência e qualidade",
     mainImages: [
       {
-        src: "/placeholder.svg?height=400&width=600&text=Projeto+1",
+        src: "/placeholder.svg",
         alt: "Projeto de Instalação de Câmeras",
         title: "Sistema de Videomonitoramento - Empresa XYZ",
       },
       {
-        src: "/placeholder.svg?height=400&width=600&text=Projeto+2",
+        src: "/placeholder.svg",
         alt: "Sistema de Controle de Acesso",
         title: "Controle de Acesso Biométrico - Condomínio ABC",
       },
       {
-        src: "/placeholder.svg?height=400&width=600&text=Projeto+3",
+        src: "/placeholder.svg",
         alt: "Sistema de Alarme Residencial",
         title: "Alarme Residencial - Casa de Alto Padrão",
       },
       {
-        src: "/placeholder.svg?height=400&width=600&text=Projeto+4",
+        src: "/placeholder.svg",
         alt: "Automação de Portão Elétrico",
         title: "Portão Automático - Residência Familiar",
       },
       {
-        src: "/placeholder.svg?height=400&width=600&text=Projeto+5",
+        src: "/placeholder.svg",
         alt: "Rede Estruturada Escritório",
         title: "Cabeamento Estruturado - Escritório Corporativo",
       },
       {
-        src: "/placeholder.svg?height=400&width=600&text=Projeto+6",
+        src: "/placeholder.svg",
         alt: "Automação Residencial",
         title: "Casa Inteligente - Automação Completa",
       },
     ],
     subGallery: Array.from({ length: 18 }, (_, i) => ({
-      src: `/placeholder.svg?height=300&width=400&text=Foto+${i + 1}`,
+      src: "/placeholder.svg",
       alt: `Projeto ${i + 1}`,
       title: `Projeto Realizado ${i + 1}`,
     })),
