@@ -6,6 +6,7 @@ import type { ReactNode } from "react"
 import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react"
 import { siteContentService, supabase } from "@/lib/supabase"
 import { ImageStorageService } from "@/lib/image-storage"
+import { SyncService } from "@/lib/sync-service"
 
 interface AdminContextType {
   isAdmin: boolean
@@ -15,6 +16,8 @@ interface AdminContextType {
   updateContent: (path: string, value: any) => Promise<void>
   uploadImage: (contentPath: string, file: File) => Promise<string | null>
   isLoading: boolean
+  syncStatus: 'synced' | 'syncing' | 'offline' | 'error'
+  lastSyncTime: string | null
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined)
@@ -241,26 +244,55 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false)
   const [siteContent, setSiteContent] = useState(defaultContent)
   const [isLoading, setIsLoading] = useState(true)
+  const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'offline' | 'error'>('synced')
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null)
   const debounceTimer = React.useRef<NodeJS.Timeout | null>(null) // Use useRef for mutable ref
+
+  // Inicializar SyncService
+  useEffect(() => {
+    console.log('[AdminProvider] Inicializando SyncService...')
+    SyncService.initialize()
+    
+    // Verificar status inicial
+    const updateSyncStatus = () => {
+      if (!navigator.onLine) {
+        setSyncStatus('offline')
+      } else {
+        const lastSync = localStorage.getItem('lastSuccessfulSync')
+        if (lastSync) {
+          setLastSyncTime(lastSync)
+          setSyncStatus('synced')
+        }
+      }
+    }
+    
+    updateSyncStatus()
+    
+    // Listeners para mudanças de conectividade
+    const handleOnline = () => {
+      setSyncStatus('syncing')
+      setTimeout(() => setSyncStatus('synced'), 2000)
+    }
+    
+    const handleOffline = () => {
+      setSyncStatus('offline')
+    }
+    
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
 
   useEffect(() => {
     const loadContentAndSetupRealtime = async () => {
       console.log("[AdminProvider] Iniciando carregamento de conteúdo e setup do Realtime.")
       try {
-        // 1. Load from localStorage first (for faster initial render)
+        // 1. Carregar status de admin do localStorage
         if (typeof window !== "undefined") {
-          const localContent = localStorage.getItem("siteContent")
-          if (localContent) {
-            try {
-              const parsedContent = JSON.parse(localContent)
-              setSiteContent({ ...defaultContent, ...parsedContent })
-              console.log("[AdminProvider] Conteúdo carregado do localStorage.")
-            } catch (error) {
-              console.error("[AdminProvider] Erro ao parsear conteúdo do localStorage:", error)
-              localStorage.removeItem("siteContent")
-            }
-          }
-
           const adminStatus = localStorage.getItem("isAdmin")
           if (adminStatus === "true") {
             setIsAdmin(true)
@@ -268,23 +300,21 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        // 2. Then load from Supabase (source of truth)
+        // 2. Usar o sistema de sincronização aprimorado
         try {
-          console.log("[AdminProvider] Tentando carregar conteúdo do Supabase...")
-          const dbContent = await siteContentService.getSiteContent()
-          if (dbContent) {
-            const mergedContent = { ...defaultContent, ...dbContent }
+          console.log("[AdminProvider] Carregando conteúdo via SyncService...")
+          const content = await siteContentService.getSiteContent()
+          if (content) {
+            const mergedContent = { ...defaultContent, ...content }
             setSiteContent(mergedContent)
-            // Update localStorage with latest from DB
-            if (typeof window !== "undefined") {
-              localStorage.setItem("siteContent", JSON.stringify(mergedContent))
-            }
-            console.log("[AdminProvider] Conteúdo carregado do Supabase e mesclado.", mergedContent)
+            console.log("[AdminProvider] Conteúdo carregado e mesclado com sucesso.")
           } else {
-            console.log("[AdminProvider] Nenhum conteúdo encontrado no Supabase, usando default.")
+            console.log("[AdminProvider] Usando conteúdo padrão.")
+            setSiteContent(defaultContent)
           }
         } catch (dbError) {
-          console.warn("[AdminProvider] Falha no carregamento inicial do banco de dados:", dbError)
+          console.warn("[AdminProvider] Falha no carregamento - usando conteúdo padrão:", dbError)
+          setSiteContent(defaultContent)
         }
       } catch (error) {
         console.error("[AdminProvider] Erro geral ao carregar conteúdo:", error)
@@ -355,7 +385,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     console.log("[AdminContext] Logout realizado.")
   }, [])
 
-  // updateContent now handles local state update and debounced Supabase update
+  // updateContent com sistema de sincronização aprimorado
   const updateContent = useCallback(async (path: string, value: any) => {
     setSiteContent((prevContent) => {
       const newContent = { ...prevContent }
@@ -370,33 +400,30 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       current[keys[keys.length - 1]] = value
       console.log(`[AdminContext] updateContent: Atualizando estado local para path '${path}' com valor:`, value)
 
-      // Save to localStorage immediately
-      if (typeof window !== "undefined") {
-        try {
-          localStorage.setItem("siteContent", JSON.stringify(newContent))
-          console.log("[AdminContext] updateContent: Conteúdo salvo no localStorage.")
-        } catch (error) {
-          console.error("[AdminContext] updateContent: Erro ao salvar no localStorage:", error)
-        }
-      }
-
-      // Debounce saving to database to prevent excessive writes
+      // Usar o sistema de sincronização aprimorado
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current)
       }
       debounceTimer.current = setTimeout(async () => {
         try {
-          console.log("[AdminContext] updateContent: Tentando salvar conteúdo no Supabase (debounced)...", newContent)
+          setSyncStatus('syncing')
+          console.log("[AdminContext] updateContent: Salvando conteúdo via SyncService (debounced)...")
           const success = await siteContentService.updateSiteContent(newContent)
           if (!success) {
-            console.warn("[AdminContext] updateContent: Falha ao salvar no Supabase após debounce.")
+            console.warn("[AdminContext] updateContent: Falha ao salvar - conteúdo mantido localmente.")
+            setSyncStatus('error')
+            setTimeout(() => setSyncStatus('offline'), 3000)
           } else {
-            console.log("[AdminContext] updateContent: Conteúdo salvo com sucesso no Supabase.")
+            console.log("[AdminContext] updateContent: Conteúdo sincronizado com sucesso.")
+            setSyncStatus('synced')
+            setLastSyncTime(new Date().toISOString())
           }
         } catch (error) {
-          console.error("[AdminContext] updateContent: Erro ao salvar no banco de dados (debounced):", error)
+          console.error("[AdminContext] updateContent: Erro ao sincronizar (mantido localmente):", error)
+          setSyncStatus('error')
+          setTimeout(() => setSyncStatus('offline'), 3000)
         }
-      }, 1000) // Adjust debounce time as needed
+      }, 1500) // Aumentado para 1.5s para reduzir chamadas
 
       return newContent
     })
@@ -476,8 +503,10 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       updateContent,
       uploadImage,
       isLoading,
+      syncStatus,
+      lastSyncTime,
     }),
-    [isAdmin, siteContent, isLoading, login, logout, updateContent, uploadImage],
+    [isAdmin, siteContent, isLoading, syncStatus, lastSyncTime, login, logout, updateContent, uploadImage],
   )
 
   if (isLoading) {

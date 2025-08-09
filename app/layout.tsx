@@ -17,6 +17,14 @@ const SyncDiagnostics = dynamic(() => import("@/components/SyncDiagnostics"), {
   ssr: false,
 })
 
+const SyncStatusIndicator = dynamic(() => import("@/components/sync-status-indicator"), {
+  ssr: false,
+})
+
+const SyncNotifications = dynamic(() => import("@/components/sync-notifications"), {
+  ssr: false,
+})
+
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
@@ -64,6 +72,8 @@ export default function RootLayout({
           {children}
           <SyncStatus />
           <SyncDiagnostics />
+          <SyncStatusIndicator />
+          <SyncNotifications />
         </AdminProvider>
       </body>
     </html>
