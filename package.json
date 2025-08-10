@@ -8,11 +8,17 @@
     "lint": "next lint",
     "start": "next start",
     "deploy": "node scripts/auto-deploy.js",
-    "deploy:prod": "npm run deploy -- --prod",
-    "deploy:preview": "npm run deploy -- --preview",
+    "deploy:prod": "vercel --prod",
+    "deploy:preview": "vercel",
     "git:push": "git add . && git commit -m \"feat: auto deploy\" && git push origin main",
     "vercel:deploy": "vercel --prod",
-    "full-deploy": "npm run git:push && npm run vercel:deploy"
+    "full-deploy": "npm run git:push && npm run vercel:deploy",
+    "dev:fast": "next dev --turbo",
+    "dev:debug": "next dev --debug",
+    "clean": "rm -rf .next node_modules/.cache",
+    "build:analyze": "ANALYZE=true npm run build",
+    "setup:vercel": "vercel link",
+    "check:deploy": "vercel ls"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

@@ -13,7 +13,7 @@ import { GalleryUpload } from "@/components/admin/gallery-upload"
 import { useAdmin } from "@/contexts/admin-context"
 
 export default function GaleriaPage() {
-  const { siteContent, isAdmin, updateContent, uploadImage } = useAdmin()
+  const { siteContent, isAdmin, updateContent, uploadImage, isLoading } = useAdmin()
   const [selectedImage, setSelectedImage] = useState<{ src: string; alt: string; title: string } | null>(null)
   const [mounted, setMounted] = useState(false)
   const [showUpload, setShowUpload] = useState(false)
@@ -23,6 +23,16 @@ export default function GaleriaPage() {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Forçar re-renderização quando siteContent mudar
+  useEffect(() => {
+    if (siteContent && mounted) {
+      console.log('[GaleriaPage] Dados da galeria carregados:', {
+        mainImages: siteContent?.gallery?.mainImages?.length || 0,
+        subGallery: siteContent?.gallery?.subGallery?.length || 0
+      })
+    }
+  }, [siteContent, mounted])
 
   const handleUploadComplete = () => {
     setShowUpload(false)
@@ -53,12 +63,14 @@ export default function GaleriaPage() {
     })
   }
 
-  if (!mounted) {
+  if (!mounted || isLoading || !siteContent) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-purple-600 text-lg">Carregando galeria...</p>
+          <p className="text-purple-600 text-lg">
+            {!mounted ? 'Inicializando...' : isLoading ? 'Carregando dados...' : 'Carregando galeria...'}
+          </p>
         </div>
       </div>
     )
@@ -165,7 +177,7 @@ export default function GaleriaPage() {
         <div className="container mx-auto px-4">
           <h3 className="text-2xl font-bold text-center mb-8">Projetos Principais</h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {siteContent?.gallery?.mainImages?.map((image: any, index: number) => {
+            {(siteContent?.gallery?.mainImages || []).map((image: any, index: number) => {
               const imageKey = `main-${index}`
               const imageSrc = image?.src || "/placeholder.svg"
 
@@ -234,7 +246,7 @@ export default function GaleriaPage() {
         <div className="container mx-auto px-4">
           <h3 className="text-2xl font-bold text-center mb-8">Mais Projetos</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {siteContent?.gallery?.subGallery?.map((image: any, index: number) => {
+            {(siteContent?.gallery?.subGallery || []).map((image: any, index: number) => {
               const imageKey = `sub-${index}`
               const imageSrc = image?.src || "/placeholder.svg"
 
@@ -311,7 +323,7 @@ export default function GaleriaPage() {
                   <EditableImage
                     path="logo"
                     src={siteContent?.logo || "/placeholder-logo.svg"}
-                    alt="Logo"/>
+                    alt="Logo"
                     width={44}
                     height={44}
                     className="object-contain"

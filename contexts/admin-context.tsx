@@ -300,7 +300,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        // 2. Usar o sistema de sincronização aprimorado
+        // 2. Definir conteúdo padrão primeiro para evitar estados vazios
+        setSiteContent(defaultContent)
+        console.log("[AdminProvider] Conteúdo padrão definido inicialmente.")
+
+        // 3. Usar o sistema de sincronização aprimorado
         try {
           console.log("[AdminProvider] Carregando conteúdo via SyncService...")
           const content = await siteContentService.getSiteContent()
@@ -309,12 +313,10 @@ export function AdminProvider({ children }: { children: ReactNode }) {
             setSiteContent(mergedContent)
             console.log("[AdminProvider] Conteúdo carregado e mesclado com sucesso.")
           } else {
-            console.log("[AdminProvider] Usando conteúdo padrão.")
-            setSiteContent(defaultContent)
+            console.log("[AdminProvider] Mantendo conteúdo padrão.")
           }
         } catch (dbError) {
-          console.warn("[AdminProvider] Falha no carregamento - usando conteúdo padrão:", dbError)
-          setSiteContent(defaultContent)
+          console.warn("[AdminProvider] Falha no carregamento - mantendo conteúdo padrão:", dbError)
         }
       } catch (error) {
         console.error("[AdminProvider] Erro geral ao carregar conteúdo:", error)
@@ -327,7 +329,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
     loadContentAndSetupRealtime()
 
-    // 3. Set up Supabase Realtime subscription for continuous updates
+    // 4. Set up Supabase Realtime subscription for continuous updates
     console.log("[AdminProvider] Configurando Realtime Subscription...")
     const channel = supabase
       .channel("site_content_changes")
