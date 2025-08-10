@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { ArrowLeft, Camera, Lock, Shield, Phone, Monitor, Wifi, Wrench, Users, Eye, DoorOpen, Scan } from "lucide-react"
+import { ArrowLeft, Camera, Lock, Shield, MessageCircle, Monitor, Wifi, Wrench, Users, Eye, DoorOpen, Scan } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
@@ -13,7 +13,7 @@ import { useAdmin } from "@/contexts/admin-context"
 export default function ServicosPage() {
   const { siteContent } = useAdmin()
 
-  const serviceIcons = [Camera, Lock, Shield, Phone, Monitor, Eye, DoorOpen, DoorOpen, Scan, Wifi, Wrench, Users]
+  const serviceIcons = [Camera, Lock, Shield, MessageCircle, Monitor, Eye, DoorOpen, DoorOpen, Scan, Wifi, Wrench, Users]
 
   return (
     <div className="min-h-screen bg-white">
@@ -115,8 +115,10 @@ export default function ServicosPage() {
               Confira alguns dos nossos trabalhos realizados e projetos de segurança implementados
             </p>
           </div>
-          <div className="max-w-6xl mx-auto">
-            <p className="text-center text-gray-500">Galeria em desenvolvimento</p>
+          <div className="max-w-6xl mx-auto text-center">
+            <Button size="lg" className="bg-slate-600 hover:bg-slate-700">
+              <Link href="/galeria">Ver na Galeria</Link>
+            </Button>
           </div>
         </div>
       </section>

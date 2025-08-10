@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Shield, Camera, Lock, Phone, Zap, Droplets, Car } from "lucide-react"
+import { Shield, Camera, Lock, MessageCircle, Zap, Droplets, Car } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
@@ -78,7 +78,7 @@ export const HomePage = memo(() => {
   // Memoized data
   const services = siteContent.services.items.slice(0, 4)
   const solutions = siteContent.solutions.items.slice(0, 3)
-  const serviceIcons = [Camera, Lock, Shield, Phone]
+  const serviceIcons = [Camera, Lock, Shield, MessageCircle]
   const solutionIcons = [Zap, Droplets, Car]
 
   return (
