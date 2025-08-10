@@ -139,15 +139,7 @@ export default function GaleriaPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center overflow-hidden">
-                <EditableImage
-                  path="logo"
-                  src={siteContent?.logo || "/placeholder-logo.svg"}
-                  alt="Logo"
-                  width={53}
-                  height={53}
-                  className="object-contain"
-                />
+              <div className="w-14 h-14 flex items-center justify-center overflow-hidden">
               </div>
               <div>
                 <EditableText
@@ -373,13 +365,13 @@ export default function GaleriaPage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-11 h-11 bg-purple-600 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-24 h-24 flex items-center justify-center overflow-hidden">
                   <EditableImage
                     path="logo"
                     src={siteContent?.logo || "/placeholder-logo.svg"}
                     alt="Logo"
-                    width={44}
-                    height={44}
+                    width={96}
+                    height={96}
                     className="object-contain"
                   />
                 </div>

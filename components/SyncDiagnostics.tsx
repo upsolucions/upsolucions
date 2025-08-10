@@ -14,7 +14,12 @@ interface DiagnosticInfo {
   canConnectToSupabase: boolean
 }
 
-export default function SyncDiagnostics() {
+interface SyncDiagnosticsProps {
+  inline?: boolean
+  onClose?: () => void
+}
+
+export default function SyncDiagnostics({ inline = false, onClose }: SyncDiagnosticsProps = {}) {
   const [isOpen, setIsOpen] = useState(false)
   const [diagnostics, setDiagnostics] = useState<DiagnosticInfo | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -61,10 +66,10 @@ export default function SyncDiagnostics() {
   }
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen || inline) {
       runDiagnostics()
     }
-  }, [isOpen])
+  }, [isOpen, inline])
 
   const handleForceSync = async () => {
     setIsLoading(true)
@@ -103,6 +108,133 @@ export default function SyncDiagnostics() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
+  const renderDiagnosticsContent = () => {
+    if (isLoading) {
+      return (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Executando diagnósticos...</p>
+        </div>
+      )
+    }
+
+    if (!diagnostics) {
+      return (
+        <div className="text-center py-8">
+          <p>Erro ao carregar diagnósticos</p>
+          <button
+            onClick={runDiagnostics}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Tentar Novamente
+          </button>
+        </div>
+      )
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="font-semibold mb-2">Status da Conexão</h3>
+            <div className="space-y-2 text-sm">
+              <div>Online: {getStatusIcon(diagnostics.isOnline)} {diagnostics.isOnline ? 'Sim' : 'Não'}</div>
+              <div>Supabase Configurado: {getStatusIcon(diagnostics.isSupabaseConfigured)} {diagnostics.isSupabaseConfigured ? 'Sim' : 'Não'}</div>
+              <div>Conexão com Supabase: {getStatusIcon(diagnostics.canConnectToSupabase)} {diagnostics.canConnectToSupabase ? 'OK' : 'Falha'}</div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="font-semibold mb-2">Status dos Dados</h3>
+            <div className="space-y-2 text-sm">
+              <div>Mudanças Pendentes: {getStatusIcon(!diagnostics.hasPendingChanges)} {diagnostics.hasPendingChanges ? 'Sim' : 'Não'}</div>
+              <div>Tamanho Local: {formatBytes(diagnostics.localStorageSize)}</div>
+              <div>Última Sync: {diagnostics.lastSync ? diagnostics.lastSync.toLocaleString() : 'Nunca'}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="font-semibold mb-2">Configuração</h3>
+          <div className="text-sm">
+            <div className="break-all">URL Supabase: {diagnostics.supabaseUrl}</div>
+          </div>
+        </div>
+
+        {!diagnostics.isSupabaseConfigured && (
+          <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+            <h3 className="font-semibold text-yellow-800 mb-2">⚠️ Supabase Não Configurado</h3>
+            <p className="text-yellow-700 text-sm mb-3">
+              Para habilitar a sincronização entre dispositivos, você precisa configurar o Supabase.
+            </p>
+            <p className="text-yellow-700 text-sm">
+              Execute: <code className="bg-yellow-100 px-2 py-1 rounded">node scripts/setup-supabase.js</code>
+            </p>
+          </div>
+        )}
+
+        {!diagnostics.canConnectToSupabase && diagnostics.isSupabaseConfigured && (
+          <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+            <h3 className="font-semibold text-red-800 mb-2">❌ Erro de Conexão</h3>
+            <p className="text-red-700 text-sm">
+              Não foi possível conectar ao Supabase. Verifique suas credenciais e se as tabelas foram criadas.
+            </p>
+          </div>
+        )}
+
+        <div className="flex gap-3 pt-4">
+          <button
+            onClick={runDiagnostics}
+            disabled={isLoading}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          >
+            Atualizar
+          </button>
+          
+          {diagnostics.isSupabaseConfigured && (
+            <button
+              onClick={handleForceSync}
+              disabled={isLoading}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+            >
+              Forçar Sync
+            </button>
+          )}
+          
+          <button
+            onClick={handleClearLocalData}
+            disabled={isLoading}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+          >
+            Limpar Dados
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Modo inline - renderizar diretamente como card
+  if (inline) {
+    return (
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-800">Diagnósticos</h2>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700 text-xl"
+              >
+                ×
+              </button>
+            )}
+          </div>
+          {renderDiagnosticsContent()}
+        </div>
+      </div>
+    )
+  }
+
   if (!isOpen) {
     return (
       <button
@@ -128,101 +260,7 @@ export default function SyncDiagnostics() {
               ×
             </button>
           </div>
-
-          {isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p>Executando diagnósticos...</p>
-            </div>
-          ) : diagnostics ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">Status da Conexão</h3>
-                  <div className="space-y-2 text-sm">
-                    <div>Online: {getStatusIcon(diagnostics.isOnline)} {diagnostics.isOnline ? 'Sim' : 'Não'}</div>
-                    <div>Supabase Configurado: {getStatusIcon(diagnostics.isSupabaseConfigured)} {diagnostics.isSupabaseConfigured ? 'Sim' : 'Não'}</div>
-                    <div>Conexão com Supabase: {getStatusIcon(diagnostics.canConnectToSupabase)} {diagnostics.canConnectToSupabase ? 'OK' : 'Falha'}</div>
-                  </div>
-                </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">Status dos Dados</h3>
-                  <div className="space-y-2 text-sm">
-                    <div>Mudanças Pendentes: {getStatusIcon(!diagnostics.hasPendingChanges)} {diagnostics.hasPendingChanges ? 'Sim' : 'Não'}</div>
-                    <div>Tamanho Local: {formatBytes(diagnostics.localStorageSize)}</div>
-                    <div>Última Sync: {diagnostics.lastSync ? diagnostics.lastSync.toLocaleString() : 'Nunca'}</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2">Configuração</h3>
-                <div className="text-sm">
-                  <div className="break-all">URL Supabase: {diagnostics.supabaseUrl}</div>
-                </div>
-              </div>
-
-              {!diagnostics.isSupabaseConfigured && (
-                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-                  <h3 className="font-semibold text-yellow-800 mb-2">⚠️ Supabase Não Configurado</h3>
-                  <p className="text-yellow-700 text-sm mb-3">
-                    Para habilitar a sincronização entre dispositivos, você precisa configurar o Supabase.
-                  </p>
-                  <p className="text-yellow-700 text-sm">
-                    Execute: <code className="bg-yellow-100 px-2 py-1 rounded">node scripts/setup-supabase.js</code>
-                  </p>
-                </div>
-              )}
-
-              {!diagnostics.canConnectToSupabase && diagnostics.isSupabaseConfigured && (
-                <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
-                  <h3 className="font-semibold text-red-800 mb-2">❌ Erro de Conexão</h3>
-                  <p className="text-red-700 text-sm">
-                    Não foi possível conectar ao Supabase. Verifique suas credenciais e se as tabelas foram criadas.
-                  </p>
-                </div>
-              )}
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={runDiagnostics}
-                  disabled={isLoading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                >
-                  Atualizar
-                </button>
-                
-                {diagnostics.isSupabaseConfigured && (
-                  <button
-                    onClick={handleForceSync}
-                    disabled={isLoading}
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-                  >
-                    Forçar Sync
-                  </button>
-                )}
-                
-                <button
-                  onClick={handleClearLocalData}
-                  disabled={isLoading}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-                >
-                  Limpar Dados
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p>Erro ao carregar diagnósticos</p>
-              <button
-                onClick={runDiagnostics}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Tentar Novamente
-              </button>
-            </div>
-          )}
+          {renderDiagnosticsContent()}
         </div>
       </div>
     </div>

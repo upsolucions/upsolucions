@@ -38,8 +38,8 @@ class DeployChecker {
       console.log(lines.join('\n'));
       
       // Extrair URL de produção mais recente
-      const lines = deployments.split('\n');
-      const productionLine = lines.find(line => 
+      const deploymentLines = deployments.split('\n');
+      const productionLine = deploymentLines.find(line => 
         line.includes('● Ready') && line.includes('Production')
       );
       

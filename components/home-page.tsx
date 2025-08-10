@@ -91,16 +91,6 @@ export const HomePage = memo(() => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-24 h-24 bg-white rounded-lg flex items-center justify-center overflow-hidden">
-                <EditableImage
-                  path="logo"
-                  src={siteContent.logo}
-                  alt="Logo"
-                  width={83}
-                  height={83}
-                  className="object-contain"
-                />
-              </div>
               <div>
                 <EditableText path="siteName" value={siteContent.siteName} as="h1" className="text-2xl font-bold" />
                 <EditableText path="slogan" value={siteContent.slogan} as="p" className="text-slate-200 text-sm" />
@@ -269,13 +259,13 @@ export const HomePage = memo(() => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-11 h-11 bg-slate-600 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-24 h-24 flex items-center justify-center overflow-hidden">
                   <EditableImage
                     path="logo"
-                    src={siteContent.logo}
+                    src={siteContent?.logo || "/placeholder-logo.svg"}
                     alt="Logo"
-                    width={44}
-                    height={44}
+                    width={96}
+                    height={96}
                     className="object-contain"
                   />
                 </div>

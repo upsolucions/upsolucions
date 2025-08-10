@@ -8,8 +8,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Settings, LogOut, Eye, Calendar, TrendingUp } from "lucide-react"
+import { Settings, LogOut, Eye, Calendar, TrendingUp, Activity, Wrench } from "lucide-react"
 import { useAdmin } from "@/contexts/admin-context"
+import dynamic from "next/dynamic"
+
+// Lazy load dos componentes de sincronização
+const SyncDiagnostics = dynamic(() => import("@/components/SyncDiagnostics"), {
+  ssr: false,
+})
+
+const SyncStatus = dynamic(() => import("@/components/SyncStatus"), {
+  ssr: false,
+})
 
 interface ViewStats {
   today: number
@@ -25,6 +35,8 @@ export function AdminLogin() {
   const [error, setError] = useState("")
   const [isOpen, setIsOpen] = useState(false)
   const [viewStats, setViewStats] = useState<ViewStats>({ today: 0, thisWeek: 0, thisMonth: 0, total: 0 })
+  const [showSyncStatus, setShowSyncStatus] = useState(false)
+  const [showDiagnostics, setShowDiagnostics] = useState(false)
 
   // Registrar visualização da página
   useEffect(() => {
@@ -135,6 +147,31 @@ export function AdminLogin() {
           </CardContent>
         </Card>
 
+        {/* Botões de Sincronização */}
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setShowSyncStatus(!showSyncStatus)}
+            variant="outline"
+            size="sm"
+            className={`${showSyncStatus ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white border-0 text-xs px-2 py-1 h-8`}
+            title="Status de Sincronização"
+          >
+            <Activity className="w-3 h-3 mr-1" />
+            Sync
+          </Button>
+          
+          <Button
+            onClick={() => setShowDiagnostics(!showDiagnostics)}
+            variant="outline"
+            size="sm"
+            className={`${showDiagnostics ? 'bg-orange-500 hover:bg-orange-600' : 'bg-purple-500 hover:bg-purple-600'} text-white border-0 text-xs px-2 py-1 h-8`}
+            title="Diagnósticos"
+          >
+            <Wrench className="w-3 h-3 mr-1" />
+            Diag
+          </Button>
+        </div>
+
         {/* Botão de Logout */}
         <Button
           onClick={logout}
@@ -145,6 +182,10 @@ export function AdminLogin() {
           <LogOut className="w-3 h-3 mr-1" />
           Sair
         </Button>
+
+        {/* Componentes de Sincronização - Renderizados condicionalmente */}
+        {showSyncStatus && <SyncStatus inline onClose={() => setShowSyncStatus(false)} />}
+        {showDiagnostics && <SyncDiagnostics inline onClose={() => setShowDiagnostics(false)} />}
       </div>
     )
   }

@@ -9,14 +9,6 @@ const AdminProvider = dynamic(() => import("@/contexts/admin-context").then(mod 
   ssr: true,
 })
 
-const SyncStatus = dynamic(() => import("@/components/SyncStatus"), {
-  ssr: false,
-})
-
-const SyncDiagnostics = dynamic(() => import("@/components/SyncDiagnostics"), {
-  ssr: false,
-})
-
 const SyncStatusIndicator = dynamic(() => import("@/components/sync-status-indicator"), {
   ssr: false,
 })
@@ -70,7 +62,6 @@ export default function RootLayout({
       <body className={inter.className}>
         <AdminProvider>
           {children}
-          <SyncDiagnostics />
           <SyncNotifications />
         </AdminProvider>
       </body>

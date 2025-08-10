@@ -5,9 +5,11 @@ import { SyncService } from '../lib/sync-service'
 
 interface SyncStatusProps {
   className?: string
+  inline?: boolean
+  onClose?: () => void
 }
 
-export default function SyncStatus({ className = '' }: SyncStatusProps) {
+export default function SyncStatus({ className = '', inline = false, onClose }: SyncStatusProps) {
   const [syncStatus, setSyncStatus] = useState({
     isOnline: true,
     isSupabaseConfigured: false,
@@ -73,7 +75,53 @@ export default function SyncStatus({ className = '' }: SyncStatusProps) {
     return `Dados sincronizados entre dispositivos. ${syncStatus.lastSync ? `Última sincronização: ${syncStatus.lastSync.toLocaleTimeString()}` : ''}`
   }
 
-  if (!isVisible) return null
+  if (!isVisible && !inline) return null
+
+  const renderStatusContent = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="relative">
+          <div className={`w-4 h-4 rounded-full ${getStatusColor()} shadow-lg`}>
+            {syncStatus.hasPendingChanges && (
+              <div className={`w-4 h-4 rounded-full ${getStatusColor()} animate-ping absolute`}></div>
+            )}
+          </div>
+        </div>
+        <div>
+          <div className="font-medium text-sm">{getStatusText()}</div>
+          <div className="text-xs text-gray-600">{getStatusDescription()}</div>
+        </div>
+      </div>
+      
+      {syncStatus.isOnline && syncStatus.isSupabaseConfigured && (
+        <button
+          onClick={handleForceSync}
+          className="w-full px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+        >
+          Forçar Sincronização
+        </button>
+      )}
+    </div>
+  )
+
+  if (inline) {
+    return (
+      <div className={`bg-white border rounded-lg p-4 shadow-sm ${className}`}>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-medium text-sm">Status de Sincronização</h3>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-sm"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        {renderStatusContent()}
+      </div>
+    )
+  }
 
   return (
     <div className={`fixed bottom-4 left-4 z-40 ${className}`}>

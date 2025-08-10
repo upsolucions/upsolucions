@@ -24,16 +24,6 @@ export default function ServicosPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center overflow-hidden">
-                <EditableImage
-                  path="logo"
-                  src={siteContent.logo}
-                  alt="Logo"
-                  width={64}
-                  height={64}
-                  className="object-contain"
-                />
-              </div>
               <div>
                 <EditableText path="siteName" value={siteContent.siteName} className="text-2xl font-bold" as="h1" />
                 <p className="text-slate-200 text-sm">Nossos Serviços</p>
@@ -148,13 +138,13 @@ export default function ServicosPage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-14 h-14 bg-slate-600 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-24 h-24 flex items-center justify-center overflow-hidden">
                   <EditableImage
                     path="logo"
-                    src={siteContent.logo}
+                    src={siteContent?.logo || "/placeholder-logo.svg"}
                     alt="Logo"
-                    width={53}
-                    height={53}
+                    width={96}
+                    height={96}
                     className="object-contain"
                   />
                 </div>
