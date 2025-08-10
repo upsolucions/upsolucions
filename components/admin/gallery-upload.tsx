@@ -94,6 +94,13 @@ export function GalleryUpload({ onClose, onUploadComplete, galleryType = 'main' 
         const updatedImages = [...currentImages, newImage]
         await updateContent(`gallery.${galleryPath}`, updatedImages)
         
+        // Forçar atualização imediata da galeria
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('galleryUpdated', {
+            detail: { galleryPath, updatedImages }
+          }))
+        }, 100)
+        
         updateFileProperty(index, 'status', 'success')
         return true
       } else {

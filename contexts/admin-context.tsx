@@ -419,13 +419,20 @@ export function AdminProvider({ children }: { children: ReactNode }) {
             console.log("[AdminContext] updateContent: Conteúdo sincronizado com sucesso.")
             setSyncStatus('synced')
             setLastSyncTime(new Date().toISOString())
+            
+            // Disparar evento de sincronização bem-sucedida
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('contentSynced', {
+                detail: { path, value, timestamp: new Date().toISOString() }
+              }))
+            }
           }
         } catch (error) {
           console.error("[AdminContext] updateContent: Erro ao sincronizar (mantido localmente):", error)
           setSyncStatus('error')
           setTimeout(() => setSyncStatus('offline'), 3000)
         }
-      }, 1500) // Aumentado para 1.5s para reduzir chamadas
+      }, 800) // Reduzido para 800ms para resposta mais rápida
 
       return newContent
     })

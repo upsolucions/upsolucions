@@ -34,21 +34,75 @@ export default function GaleriaPage() {
     }
   }, [siteContent, mounted])
 
+  // Escutar eventos de atualização da galeria
+  useEffect(() => {
+    const handleGalleryUpdate = (event: CustomEvent) => {
+      console.log('[GaleriaPage] Evento de atualização da galeria recebido:', event.detail)
+      // Forçar re-renderização removendo e adicionando erros de imagem
+      setImageLoadErrors({})
+      // Pequeno delay para garantir que o DOM seja atualizado
+      setTimeout(() => {
+        setMounted(false)
+        setTimeout(() => setMounted(true), 50)
+      }, 100)
+    }
+
+    const handleContentSynced = (event: CustomEvent) => {
+      const { path } = event.detail
+      if (path && path.startsWith('gallery.')) {
+        console.log('[GaleriaPage] Conteúdo da galeria sincronizado:', event.detail)
+        // Forçar re-renderização quando conteúdo da galeria for sincronizado
+        setImageLoadErrors({})
+        setTimeout(() => {
+          setMounted(false)
+          setTimeout(() => setMounted(true), 50)
+        }, 100)
+      }
+    }
+
+    window.addEventListener('galleryUpdated', handleGalleryUpdate as EventListener)
+    window.addEventListener('contentSynced', handleContentSynced as EventListener)
+    
+    return () => {
+      window.removeEventListener('galleryUpdated', handleGalleryUpdate as EventListener)
+      window.removeEventListener('contentSynced', handleContentSynced as EventListener)
+    }
+  }, [])
+
   const handleUploadComplete = () => {
     setShowUpload(false)
-    // O componente GalleryUpload já atualiza o conteúdo automaticamente
+    // Forçar atualização da galeria após upload
+    setTimeout(() => {
+      setImageLoadErrors({})
+      setMounted(false)
+      setTimeout(() => setMounted(true), 50)
+    }, 200)
   }
 
   const removeMainImage = async (index: number) => {
     const currentImages = siteContent?.gallery?.mainImages || []
     const updatedImages = currentImages.filter((_: any, i: number) => i !== index)
     await updateContent("gallery.mainImages", updatedImages)
+    
+    // Disparar evento de atualização imediata
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('galleryUpdated', {
+        detail: { galleryPath: 'mainImages', updatedImages }
+      }))
+    }, 100)
   }
 
   const removeSubImage = async (index: number) => {
     const currentImages = siteContent?.gallery?.subGallery || []
     const updatedImages = currentImages.filter((_: any, i: number) => i !== index)
     await updateContent("gallery.subGallery", updatedImages)
+    
+    // Disparar evento de atualização imediata
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('galleryUpdated', {
+        detail: { galleryPath: 'subGallery', updatedImages }
+      }))
+    }, 100)
   }
 
   const handleImageError = (imageKey: string) => {
