@@ -196,21 +196,11 @@ export default function SolucoesPage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-24 h-24 flex items-center justify-center overflow-hidden">
-                  <EditableImage
-                    path="logo"
-                    src={siteContent?.logo || "/placeholder-logo.svg"}
-                    alt="Logo"
-                    width={96}
-                    height={96}
-                    className="object-contain"
-                  />
-                </div>
-                <div>
-                  <EditableText path="siteName" value={siteContent.siteName} className="text-xl font-bold" as="h4" />
-                  <p className="text-gray-400 text-sm">Automação e Energia</p>
-                </div>
+              <div>
+                <EditableText path="siteName" value={siteContent.siteName} className="text-xl font-bold" as="h4" />
+                <p className="text-gray-400 text-sm">Automação e Energia</p>
               </div>
+            </div>
             </div>
             <div>
               <h5 className="text-lg font-semibold mb-4">Contato</h5>

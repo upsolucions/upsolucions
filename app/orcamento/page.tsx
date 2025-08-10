@@ -419,16 +419,6 @@ Mensagem enviada através do site oficial ${siteContent.siteName}`
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-24 h-24 flex items-center justify-center overflow-hidden">
-                  <EditableImage
-                    path="logo"
-                    src={siteContent?.logo || "/placeholder-logo.svg"}
-                    alt="Logo"
-                    width={96}
-                    height={96}
-                    className="object-contain"
-                  />
-                </div>
                 <div>
                   <EditableText path="siteName" value={siteContent.siteName} className="text-xl font-bold" as="h4" />
                   <p className="text-gray-400 text-sm">Orçamento Gratuito</p>
