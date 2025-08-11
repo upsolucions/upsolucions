@@ -23,20 +23,15 @@ export default function SolucoesPage() {
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [selectedSolutionIndex, setSelectedSolutionIndex] = useState<number | null>(null)
 
-  // Removido solutionIcons - agora usando componentes de upload
-
   const handleImageUpload = async (file: File, title: string, alt: string) => {
     if (selectedSolutionIndex !== null) {
-      // useAdmin().uploadImage now handles generating the unique storage path.
       const imageUrl = await uploadImage(`solutions.items.${selectedSolutionIndex}.image`, file)
       if (imageUrl) {
-        // Update the specific solution's image URL in the content
         await updateContent(`solutions.items.${selectedSolutionIndex}.image`, imageUrl)
         setShowUploadModal(false)
         setSelectedSolutionIndex(null)
       } else {
         console.error("Failed to upload solution image to Supabase. Image will not be updated.")
-        // Optionally, show an error message to the user here
       }
     }
   }
@@ -51,7 +46,6 @@ export default function SolucoesPage() {
       <AdminLogin />
       <Watermark pageId="solucoes" />
 
-      {/* Header */}
       <header className="bg-green-700 text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -81,7 +75,6 @@ export default function SolucoesPage() {
         </div>
       </header>
 
-      {/* Page Header */}
       <section className="bg-gradient-to-r from-green-700 to-green-500 text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <EditableText
@@ -100,7 +93,6 @@ export default function SolucoesPage() {
         </div>
       </section>
 
-      {/* Solutions */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="space-y-16">
@@ -128,62 +120,60 @@ export default function SolucoesPage() {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        <EditableText
-                          path={`solutions.items.${index}.fullDescription`}
-                          value={solution.fullDescription}
-                          className="text-gray-600 text-base leading-relaxed"
-                          as="p"
-                          multiline
-                        />
-                        <div>
-                          <h4 className="font-semibold text-gray-900 mb-3">Principais características:</h4>
-                          <ul className="space-y-2">
-                            {solution.features?.map((feature: string, featureIndex: number) => (
-                              <li key={featureIndex} className="flex items-center text-gray-600">
-                                <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                                <EditableText
-                                  path={`solutions.items.${index}.features.${featureIndex}`}
-                                  value={feature}
-                                />
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        <Button className="bg-green-600 hover:bg-green-700">
-                          <Link href="/orcamento">Solicitar Orçamento</Link>
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  <div className={index % 2 === 1 ? "lg:col-start-1" : ""}>
-                    <div className="relative h-80 lg:h-96 rounded-lg overflow-hidden shadow-lg group">
-                      <EditableImage
-                        path={`solutions.items.${index}.image`}
-                        src={solution.image}
-                        alt={solution.title}
-                        fill
-                        className="object-cover"
+                      <EditableText
+                        path={`solutions.items.${index}.fullDescription`}
+                        value={solution.fullDescription}
+                        className="text-gray-600 text-base leading-relaxed"
+                        as="p"
+                        multiline
                       />
-                      {isAdmin && (
-                        <Button
-                          size="sm"
-                          className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-green-600 hover:bg-green-700"
-                          onClick={() => openUploadModal(index)}
-                        >
-                          <Upload className="w-4 h-4 mr-2" />
-                          Alterar Imagem
-                        </Button>
-                      )}
-                    </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-3">Principais características:</h4>
+                        <ul className="space-y-2">
+                          {solution.features?.map((feature: string, featureIndex: number) => (
+                            <li key={featureIndex} className="flex items-center text-gray-600">
+                              <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                              <EditableText
+                                path={`solutions.items.${index}.features.${featureIndex}`}
+                                value={feature}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <Button className="bg-green-600 hover:bg-green-700">
+                        <Link href="/orcamento">Solicitar Orçamento</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className={index % 2 === 1 ? "lg:col-start-1" : ""}>
+                  <div className="relative h-80 lg:h-96 rounded-lg overflow-hidden shadow-lg group">
+                    <EditableImage
+                      path={`solutions.items.${index}.image`}
+                      src={solution.image}
+                      alt={solution.title}
+                      fill
+                      className="object-cover"
+                    />
+                    {isAdmin && (
+                      <Button
+                        size="sm"
+                        className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-green-600 hover:bg-green-700"
+                        onClick={() => openUploadModal(index)}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Alterar Imagem
+                      </Button>
+                    )}
                   </div>
                 </div>
-              )
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-16 bg-green-700 text-white">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-bold mb-4">Pronto para Automatizar?</h3>
@@ -205,7 +195,6 @@ export default function SolucoesPage() {
         </div>
       </section>
 
-      {/* Diagnósticos de Upload - Apenas para Admin */}
       {isAdmin && (
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
@@ -213,33 +202,32 @@ export default function SolucoesPage() {
               Diagnósticos e Correções
             </h2>
             <div className="space-y-8">
-                <EmergencyReset />
-                <ConnectivityFix />
-                <WatermarkFix />
-                <SolutionsSyncTest />
-                <UploadDiagnostics />
-              </div>
+              <EmergencyReset />
+              <ConnectivityFix />
+              <WatermarkFix />
+              <SolutionsSyncTest />
+              <UploadDiagnostics />
+            </div>
           </div>
         </section>
       )}
 
-      {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
-              <UploadableLogo
-                path="logo"
-                currentSrc={siteContent.logo}
-                alt="Logo da empresa"
-                className="h-12 w-auto"
-              />
-              <div>
-                <EditableText path="siteName" value={siteContent.siteName} className="text-xl font-bold" as="h4" />
-                <p className="text-gray-400 text-sm">Automação e Energia</p>
+                <UploadableLogo
+                  path="logo"
+                  currentSrc={siteContent.logo}
+                  alt="Logo da empresa"
+                  className="h-12 w-auto"
+                />
+                <div>
+                  <EditableText path="siteName" value={siteContent.siteName} className="text-xl font-bold" as="h4" />
+                  <p className="text-gray-400 text-sm">Automação e Energia</p>
+                </div>
               </div>
-            </div>
             </div>
             <div>
               <h5 className="text-lg font-semibold mb-4">Contato</h5>
@@ -284,7 +272,6 @@ export default function SolucoesPage() {
         </div>
       </footer>
 
-      {/* Upload Modal */}
       {showUploadModal && (
         <ImageUploadModal
           isOpen={showUploadModal}
