@@ -1,0 +1,45 @@
+
+// Otimizações específicas do webpack para performance
+module.exports = {
+  // Configurações de cache
+  cache: {
+    type: 'filesystem',
+    allowCollectingMemory: true,
+    buildDependencies: {
+      config: [__filename],
+    },
+  },
+  
+  // Otimizações de resolução
+  resolve: {
+    symlinks: false,
+    cacheWithContext: false,
+  },
+  
+  // Configurações de snapshot
+  snapshot: {
+    managedPaths: [],
+    immutablePaths: [],
+    buildDependencies: {
+      hash: true,
+      timestamp: true,
+    },
+    module: {
+      timestamp: true,
+    },
+    resolve: {
+      timestamp: true,
+    },
+    resolveBuildDependencies: {
+      hash: true,
+      timestamp: true,
+    },
+  },
+  
+  // Configurações de watch
+  watchOptions: {
+    poll: false,
+    aggregateTimeout: 200,
+    ignored: ['**/node_modules/**', '**/.git/**', '**/.next/**'],
+  },
+}
