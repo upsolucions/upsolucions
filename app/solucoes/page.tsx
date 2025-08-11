@@ -4,11 +4,18 @@ import Link from "next/link"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { ArrowLeft, Zap, Droplets, Car, Upload } from "lucide-react"
+import { ArrowLeft, Upload } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
+import { UploadableServiceIcon, UploadableLogo } from "@/components/admin/uploadable-image"
 import { ImageUploadModal } from "@/components/admin/image-upload-modal"
+import { SolutionsSyncTest } from "@/components/admin/solutions-sync-test"
+import { UploadDiagnostics } from "@/components/admin/upload-diagnostics"
+import { ConnectivityFix } from "@/components/admin/connectivity-fix"
+import { WatermarkFix } from "@/components/admin/watermark-fix"
+import { EmergencyReset } from "@/components/admin/emergency-reset"
+import { Watermark } from "@/components/watermark"
 import { useAdmin } from "@/contexts/admin-context"
 
 export default function SolucoesPage() {
@@ -16,7 +23,7 @@ export default function SolucoesPage() {
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [selectedSolutionIndex, setSelectedSolutionIndex] = useState<number | null>(null)
 
-  const solutionIcons = [Zap, Droplets, Car]
+  // Removido solutionIcons - agora usando componentes de upload
 
   const handleImageUpload = async (file: File, title: string, alt: string) => {
     if (selectedSolutionIndex !== null) {
@@ -42,12 +49,19 @@ export default function SolucoesPage() {
   return (
     <div className="min-h-screen bg-white">
       <AdminLogin />
+      <Watermark pageId="solucoes" />
 
       {/* Header */}
       <header className="bg-green-700 text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              <UploadableLogo
+                path="logo"
+                currentSrc={siteContent.logo}
+                alt="Logo da empresa"
+                className="h-12 w-auto"
+              />
               <div>
                 <EditableText path="siteName" value={siteContent.siteName} className="text-2xl font-bold" as="h1" />
                 <p className="text-green-200 text-sm">Automação e Energia</p>
@@ -90,28 +104,29 @@ export default function SolucoesPage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="space-y-16">
-            {siteContent.solutions.items.map((solution: any, index: number) => {
-              const IconComponent = solutionIcons[index] || Zap
-              return (
-                <div
-                  key={index}
-                  className={`grid lg:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? "lg:grid-flow-col-dense" : ""}`}
-                >
-                  <div className={index % 2 === 1 ? "lg:col-start-2" : ""}>
-                    <Card className="h-full">
-                      <CardHeader>
-                        <div className="flex items-center space-x-3 mb-4">
-                          <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                            <IconComponent className="w-8 h-8 text-green-600" />
-                          </div>
-                          <EditableText
-                            path={`solutions.items.${index}.title`}
-                            value={solution.title}
-                            className="text-2xl font-semibold"
-                            as="h3"
-                          />
-                        </div>
-                      </CardHeader>
+            {siteContent.solutions.items.map((solution: any, index: number) => (
+              <div
+                key={index}
+                className={`grid lg:grid-cols-2 gap-12 items-center ${index % 2 === 1 ? "lg:grid-flow-col-dense" : ""}`}
+              >
+                <div className={index % 2 === 1 ? "lg:col-start-2" : ""}>
+                  <Card className="h-full">
+                    <CardHeader>
+                      <div className="flex items-center space-x-3 mb-4">
+                        <UploadableServiceIcon
+                          path={`solutions.items.${index}.icon`}
+                          currentSrc={solution.icon}
+                          alt={`Ícone ${solution.title}`}
+                          className="bg-green-100 rounded-lg p-2"
+                        />
+                        <EditableText
+                          path={`solutions.items.${index}.title`}
+                          value={solution.title}
+                          className="text-2xl font-semibold"
+                          as="h3"
+                        />
+                      </div>
+                    </CardHeader>
                       <CardContent className="space-y-6">
                         <EditableText
                           path={`solutions.items.${index}.fullDescription`}
@@ -163,7 +178,7 @@ export default function SolucoesPage() {
                   </div>
                 </div>
               )
-            })}
+            ))}
           </div>
         </div>
       </section>
@@ -190,12 +205,36 @@ export default function SolucoesPage() {
         </div>
       </section>
 
+      {/* Diagnósticos de Upload - Apenas para Admin */}
+      {isAdmin && (
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold text-center mb-8 text-gray-900">
+              Diagnósticos e Correções
+            </h2>
+            <div className="space-y-8">
+                <EmergencyReset />
+                <ConnectivityFix />
+                <WatermarkFix />
+                <SolutionsSyncTest />
+                <UploadDiagnostics />
+              </div>
+          </div>
+        </section>
+      )}
+
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
+              <UploadableLogo
+                path="logo"
+                currentSrc={siteContent.logo}
+                alt="Logo da empresa"
+                className="h-12 w-auto"
+              />
               <div>
                 <EditableText path="siteName" value={siteContent.siteName} className="text-xl font-bold" as="h4" />
                 <p className="text-gray-400 text-sm">Automação e Energia</p>

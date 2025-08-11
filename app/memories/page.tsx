@@ -1,4 +1,5 @@
 import { MemoriesPublic } from '@/components/memories-public'
+import { Watermark } from '@/components/watermark'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 export default function MemoriesPage() {
   return (
     <div className="min-h-screen bg-white">
+      <Watermark pageId="memories" />
       <MemoriesPublic />
     </div>
   )

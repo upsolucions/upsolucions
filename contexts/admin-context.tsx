@@ -408,6 +408,26 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       }
       debounceTimer.current = setTimeout(async () => {
         try {
+          // Verificar se o Supabase está configurado antes de tentar sincronizar
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+          const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+          
+          const isSupabaseConfigured = supabaseUrl && 
+                                     !supabaseUrl.includes('localhost') && 
+                                     !supabaseUrl.includes('your-project') && 
+                                     supabaseUrl.startsWith('https://') &&
+                                     supabaseUrl.length > 20 &&
+                                     supabaseKey && 
+                                     supabaseKey !== 'demo-key' && 
+                                     supabaseKey.length > 20
+          
+          if (!isSupabaseConfigured) {
+            console.log("[AdminContext] updateContent: Supabase não configurado - salvando apenas localmente")
+            setSyncStatus('offline')
+            setLastSyncTime(new Date().toISOString())
+            return
+          }
+          
           setSyncStatus('syncing')
           console.log("[AdminContext] updateContent: Salvando conteúdo via SyncService (debounced)...")
           const success = await siteContentService.updateSiteContent(newContent)

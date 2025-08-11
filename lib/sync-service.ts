@@ -13,7 +13,20 @@ export class SyncService {
   // Verificar se o Supabase está configurado
   private static isSupabaseConfigured(): boolean {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-    return !url.includes('localhost') && !url.includes('your-project') && url.startsWith('https://')
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    
+    // Verificar se as variáveis estão definidas e não são valores padrão
+    const hasValidUrl = url && 
+                       !url.includes('localhost') && 
+                       !url.includes('your-project') && 
+                       url.startsWith('https://') &&
+                       url.length > 20
+    
+    const hasValidKey = key && 
+                       key !== 'demo-key' && 
+                       key.length > 20
+    
+    return hasValidUrl && hasValidKey
   }
 
   // Detectar se está online
@@ -411,18 +424,25 @@ export class SyncService {
     console.log('[SyncService] Inicializando serviço de sincronização...')
     this.initializeOnlineDetection()
     
+    // Verificar se o Supabase está configurado
+    const isConfigured = this.isSupabaseConfigured()
+    if (!isConfigured) {
+      console.log('[SyncService] Supabase não configurado - modo offline permanente')
+      return
+    }
+    
     // Detectar quando a aba fica visível novamente
     if (typeof window !== 'undefined') {
       document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && this.isOnline) {
+        if (!document.hidden && this.isOnline && this.isSupabaseConfigured()) {
           console.log('[SyncService] Aba ficou visível - verificando sincronização')
           this.syncToCloud()
         }
       })
     }
     
-    // Tentar sincronizar na inicialização se online
-    if (this.isOnline && this.isSupabaseConfigured()) {
+    // Tentar sincronizar na inicialização se online e configurado
+    if (this.isOnline && isConfigured) {
       this.startBackgroundSync()
       setTimeout(() => this.syncToCloud(), 1000)
     }
@@ -432,6 +452,12 @@ export class SyncService {
   private static startBackgroundSync(): void {
     if (this.syncInterval) {
       clearInterval(this.syncInterval)
+    }
+    
+    // Só iniciar se o Supabase estiver configurado
+    if (!this.isSupabaseConfigured()) {
+      console.log('[SyncService] Supabase não configurado - não iniciando sincronização em background')
+      return
     }
     
     this.syncInterval = setInterval(() => {

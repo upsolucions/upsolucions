@@ -5,18 +5,23 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Shield, Camera, Lock, MessageCircle, Zap, Droplets, Car } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
+import { UploadableServiceIcon, UploadableLogo } from "@/components/admin/uploadable-image"
+import { Watermark } from "@/components/watermark"
 // Customização de páginas removida por problemas de funcionamento
 import { useAdmin } from "@/contexts/admin-context"
 
 // Memoized components for better performance
-const ServiceCard = memo(({ service, index, Icon }: { service: any; index: number; Icon: any }) => (
+const ServiceCard = memo(({ service, index }: { service: any; index: number }) => (
   <Card className="hover:shadow-lg transition-shadow">
     <CardHeader className="text-center">
-      <Icon className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+      <UploadableServiceIcon
+        path={`services.items.${index}.image`}
+        currentSrc={service.image}
+        alt={service.title}
+      />
       <EditableText
         path={`services.items.${index}.title`}
         value={service.title}
@@ -36,10 +41,14 @@ const ServiceCard = memo(({ service, index, Icon }: { service: any; index: numbe
   </Card>
 ))
 
-const SolutionCard = memo(({ solution, index, Icon }: { solution: any; index: number; Icon: any }) => (
+const SolutionCard = memo(({ solution, index }: { solution: any; index: number }) => (
   <Card className="hover:shadow-lg transition-shadow">
     <CardHeader className="text-center">
-      <Icon className="w-12 h-12 text-green-600 mx-auto mb-4" />
+      <UploadableServiceIcon
+        path={`solutions.items.${index}.image`}
+        currentSrc={solution.image}
+        alt={solution.title}
+      />
       <EditableText
         path={`solutions.items.${index}.title`}
         value={solution.title}
@@ -78,19 +87,24 @@ export const HomePage = memo(() => {
   // Memoized data
   const services = siteContent.services.items.slice(0, 4)
   const solutions = siteContent.solutions.items.slice(0, 3)
-  const serviceIcons = [Camera, Lock, Shield, MessageCircle]
-  const solutionIcons = [Zap, Droplets, Car]
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
         <AdminLogin />
+        <Watermark pageId="home" />
         
 
         {/* Header */}
-        <header className="bg-slate-600 text-white shadow-lg">
+        <header className="bg-slate-600 text-white shadow-lg relative z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              <UploadableLogo
+                path="logo"
+                currentSrc={siteContent.logo}
+                alt="Logo da empresa"
+                className="h-12 w-auto"
+              />
               <div>
                 <EditableText path="siteName" value={siteContent.siteName} as="h1" className="text-2xl font-bold" />
                 <EditableText path="slogan" value={siteContent.slogan} as="p" className="text-slate-200 text-sm" />
@@ -122,7 +136,7 @@ export const HomePage = memo(() => {
       </header>
 
         {/* Hero */}
-        <section className="bg-gradient-to-r from-slate-600 to-slate-500 text-white py-20">
+        <section className="bg-gradient-to-r from-slate-600 to-slate-500 text-white py-20 relative z-10">
         <div className="container mx-auto px-4 text-center">
           <EditableText path="hero.title" value={siteContent.hero.title} as="h2" className="text-5xl font-bold mb-6" />
           <EditableText
@@ -149,7 +163,7 @@ export const HomePage = memo(() => {
       </section>
 
         {/* Services */}
-        <section id="servicos" className="py-16 bg-gray-50">
+        <section id="servicos" className="py-16 bg-gray-50 relative z-10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <EditableText
@@ -169,7 +183,7 @@ export const HomePage = memo(() => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {services.map((service: any, index: number) => (
-              <ServiceCard key={`service-${index}`} service={service} index={index} Icon={serviceIcons[index]} />
+              <ServiceCard key={`service-${index}`} service={service} index={index} />
             ))}
           </div>
 
@@ -182,7 +196,7 @@ export const HomePage = memo(() => {
       </section>
 
         {/* Solutions */}
-        <section id="solucoes" className="py-16">
+        <section id="solucoes" className="py-16 relative z-10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <EditableText
@@ -202,7 +216,7 @@ export const HomePage = memo(() => {
 
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             {solutions.map((solution: any, index: number) => (
-              <SolutionCard key={`solution-${index}`} solution={solution} index={index} Icon={solutionIcons[index]} />
+              <SolutionCard key={`solution-${index}`} solution={solution} index={index} />
             ))}
           </div>
 
@@ -215,7 +229,7 @@ export const HomePage = memo(() => {
       </section>
 
         {/* FAQ */}
-        <section id="faq" className="py-16 bg-gray-50">
+        <section id="faq" className="py-16 bg-gray-50 relative z-10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">Perguntas Frequentes</h3>
@@ -233,7 +247,7 @@ export const HomePage = memo(() => {
       </section>
 
         {/* CTA */}
-        <section className="py-16 bg-slate-600 text-white">
+        <section className="py-16 bg-slate-600 text-white relative z-10">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-bold mb-4">Pronto para Proteger seu Patrimônio?</h3>
           <p className="text-xl mb-8">Entre em contato conosco e solicite seu orçamento gratuito</p>
@@ -254,11 +268,17 @@ export const HomePage = memo(() => {
       </section>
 
         {/* Footer */}
-        <footer id="contato" className="bg-gray-900 text-white py-12">
+        <footer id="contato" className="bg-gray-900 text-white py-12 relative z-10">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
+                <UploadableLogo
+                  path="logo"
+                  currentSrc={siteContent.logo}
+                  alt="Logo da empresa"
+                  className="h-12 w-auto"
+                />
                 <div>
                   <EditableText path="siteName" value={siteContent.siteName} as="h4" className="text-xl font-bold" />
                   <EditableText path="slogan" value={siteContent.slogan} as="p" className="text-gray-400 text-sm" />

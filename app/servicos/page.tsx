@@ -3,27 +3,40 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { ArrowLeft, Camera, Lock, Shield, MessageCircle, Monitor, Wifi, Wrench, Users, Eye, DoorOpen, Scan } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
+import { UploadableServiceIcon, UploadableLogo } from "@/components/admin/uploadable-image"
+import { UploadDiagnostics } from "@/components/admin/upload-diagnostics"
+import { ServiceUploadTest } from "@/components/admin/service-upload-test"
+import { AdminStatusTest } from "@/components/admin/admin-status-test"
+import { SupabaseConnectivityTest } from "@/components/admin/supabase-connectivity-test"
+import { Watermark } from "@/components/watermark"
 
 import { useAdmin } from "@/contexts/admin-context"
 
 export default function ServicosPage() {
-  const { siteContent } = useAdmin()
+  const { siteContent, isAdmin } = useAdmin()
 
-  const serviceIcons = [Camera, Lock, Shield, MessageCircle, Monitor, Eye, DoorOpen, DoorOpen, Scan, Wifi, Wrench, Users]
+  // Removido serviceIcons - agora usando componentes de upload
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
       <AdminLogin />
+      <Watermark pageId="servicos" />
 
       {/* Header */}
-      <header className="bg-slate-600 text-white shadow-lg">
+      <header className="bg-slate-600 text-white shadow-lg relative z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              <UploadableLogo
+                path="logo"
+                currentSrc={siteContent.logo}
+                alt="Logo da empresa"
+                className="h-12 w-auto"
+              />
               <div>
                 <EditableText path="siteName" value={siteContent.siteName} className="text-2xl font-bold" as="h1" />
                 <p className="text-slate-200 text-sm">Nossos Serviços</p>
@@ -44,7 +57,7 @@ export default function ServicosPage() {
       </header>
 
       {/* Page Header */}
-      <section className="bg-gradient-to-r from-slate-600 to-slate-500 text-white py-16">
+      <section className="bg-gradient-to-r from-slate-600 to-slate-500 text-white py-16 relative z-10">
         <div className="container mx-auto px-4 text-center">
           <EditableText
             path="services.title"
@@ -63,51 +76,53 @@ export default function ServicosPage() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-16">
+      <section className="py-16 relative z-10">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {siteContent.services.items.map((service: any, index: number) => {
-              const IconComponent = serviceIcons[index] || Shield
-              return (
-                <Card key={index} className="hover:shadow-lg transition-shadow overflow-hidden">
-                  <div className="relative h-48">
-                    <EditableImage
-                      path={`services.items.${index}.image`}
-                      src={service.image}
-                      alt={service.title}
-                      fill
-                      className="object-cover"
+            {siteContent.services.items.map((service: any, index: number) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow overflow-hidden">
+                <div className="relative h-48">
+                  <EditableImage
+                    path={`services.items.${index}.image`}
+                    src={service.image}
+                    alt={service.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <CardHeader className="text-center">
+                  <div className="flex justify-center mb-4">
+                    <UploadableServiceIcon
+                      path={`services.items.${index}.icon`}
+                      currentSrc={service.icon}
+                      alt={`Ícone ${service.title}`}
+                      className="bg-white bg-opacity-90 rounded-lg p-2"
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                      <IconComponent className="w-12 h-12 text-white" />
-                    </div>
                   </div>
-                  <CardHeader>
-                    <EditableText
-                      path={`services.items.${index}.title`}
-                      value={service.title}
-                      className="text-lg font-semibold"
-                      as="h3"
-                    />
-                  </CardHeader>
-                  <CardContent>
-                    <EditableText
-                      path={`services.items.${index}.fullDescription`}
-                      value={service.fullDescription}
-                      className="text-gray-600"
-                      as="p"
-                      multiline
-                    />
-                  </CardContent>
-                </Card>
-              )
-            })}
+                  <EditableText
+                    path={`services.items.${index}.title`}
+                    value={service.title}
+                    className="text-lg font-semibold"
+                    as="h3"
+                  />
+                </CardHeader>
+                <CardContent>
+                  <EditableText
+                    path={`services.items.${index}.fullDescription`}
+                    value={service.fullDescription}
+                    className="text-gray-600"
+                    as="p"
+                    multiline
+                  />
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Gallery Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 relative z-10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold mb-4 text-gray-900">Galeria de Projetos</h3>
@@ -124,7 +139,7 @@ export default function ServicosPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-slate-600 text-white">
+      <section className="py-16 bg-slate-600 text-white relative z-10">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-3xl font-bold mb-4">Interessado em Nossos Serviços?</h3>
           <p className="text-xl mb-8">Solicite um orçamento gratuito e sem compromisso</p>
@@ -134,12 +149,35 @@ export default function ServicosPage() {
         </div>
       </section>
 
+      {/* Diagnósticos de Upload - Apenas para Admin */}
+      {isAdmin && (
+        <section className="py-16 bg-gray-50 relative z-10">
+          <div className="container mx-auto px-4">
+            <h3 className="text-2xl font-bold text-center mb-8 text-gray-900">
+              Diagnósticos de Upload - Página de Serviços
+            </h3>
+            <div className="space-y-8">
+              <AdminStatusTest />
+              <SupabaseConnectivityTest />
+              <ServiceUploadTest />
+              <UploadDiagnostics />
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-12 relative z-10">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
+                <UploadableLogo
+                  path="logo"
+                  currentSrc={siteContent.logo}
+                  alt="Logo da empresa"
+                  className="h-12 w-auto"
+                />
                 <div>
                   <EditableText path="siteName" value={siteContent.siteName} className="text-xl font-bold" as="h4" />
                 </div>

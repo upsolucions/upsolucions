@@ -20,12 +20,7 @@
     }
   },
   "regions": ["gru1"],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/"
-    }
-  ],
+
   "git": {
     "deploymentEnabled": {
       "main": true

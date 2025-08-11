@@ -8,8 +8,10 @@ import { ArrowLeft, Plus, Trash2, Upload } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
+import { UploadableLogo } from "@/components/admin/uploadable-image"
 import { ImageModal } from "@/components/admin/image-modal"
 import { GalleryUpload } from "@/components/admin/gallery-upload"
+import { Watermark } from "@/components/watermark"
 import { useAdmin } from "@/contexts/admin-context"
 
 export default function GaleriaPage() {
@@ -133,14 +135,19 @@ export default function GaleriaPage() {
   return (
     <div className="min-h-screen bg-white">
       <AdminLogin />
+      <Watermark pageId="galeria" />
 
       {/* Header */}
       <header className="bg-purple-700 text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-14 h-14 flex items-center justify-center overflow-hidden">
-              </div>
+              <UploadableLogo
+                path="logo"
+                currentSrc={siteContent.logo}
+                alt="Logo da empresa"
+                className="h-12 w-auto"
+              />
               <div>
                 <EditableText
                   path="siteName"
@@ -365,6 +372,12 @@ export default function GaleriaPage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
+                <UploadableLogo
+                  path="logo"
+                  currentSrc={siteContent.logo}
+                  alt="Logo da empresa"
+                  className="h-12 w-auto"
+                />
                 <div>
                   <EditableText
                     path="siteName"

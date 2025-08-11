@@ -13,6 +13,8 @@ import { ArrowLeft, CheckCircle } from "lucide-react"
 import { AdminLogin } from "@/components/admin/admin-login"
 import { EditableText } from "@/components/admin/editable-text"
 import { EditableImage } from "@/components/admin/editable-image"
+import { UploadableLogo } from "@/components/admin/uploadable-image"
+import { Watermark } from "@/components/watermark"
 import { useAdmin } from "@/contexts/admin-context"
 
 export default function OrcamentoPage() {
@@ -104,14 +106,21 @@ Mensagem enviada através do site oficial ${siteContent.siteName}`
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white relative">
         <AdminLogin />
+        <Watermark pageId="orcamento" />
 
         {/* Header */}
-        <header className="bg-orange-600 text-white shadow-lg">
+        <header className="bg-orange-600 text-white shadow-lg relative z-10">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
+                <UploadableLogo
+                  path="logo"
+                  currentSrc={siteContent.logo}
+                  alt="Logo da empresa"
+                  className="h-12 w-auto"
+                />
                 <div>
                   <EditableText path="siteName" value={siteContent.siteName} className="text-2xl font-bold" as="h1" />
                   <p className="text-orange-200 text-sm">Orçamento Enviado</p>
@@ -132,7 +141,7 @@ Mensagem enviada através do site oficial ${siteContent.siteName}`
         </header>
 
         {/* Success Message */}
-        <section className="py-20">
+        <section className="py-20 relative z-10">
           <div className="container mx-auto px-4">
             <div className="max-w-md mx-auto text-center">
               <Card className="p-8">
@@ -178,11 +187,17 @@ Mensagem enviada através do site oficial ${siteContent.siteName}`
         </section>
 
         {/* Footer */}
-        <footer className="bg-gray-900 text-white py-12">
+        <footer className="bg-gray-900 text-white py-12 relative z-10">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-4 gap-8">
               <div>
                 <div className="flex items-center space-x-3 mb-4">
+                  <UploadableLogo
+                    path="logo"
+                    currentSrc={siteContent.logo}
+                    alt="Logo da empresa"
+                    className="h-12 w-auto"
+                  />
                   <div>
                     <EditableText path="siteName" value={siteContent.siteName} className="text-xl font-bold" as="h4" />
                     <p className="text-gray-400 text-sm">Orçamento Gratuito</p>
@@ -236,14 +251,21 @@ Mensagem enviada através do site oficial ${siteContent.siteName}`
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
       <AdminLogin />
+      <Watermark pageId="orcamento" />
 
       {/* Header */}
-      <header className="bg-orange-600 text-white shadow-lg">
+      <header className="bg-orange-600 text-white shadow-lg relative z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
+              <UploadableLogo
+                path="logo"
+                currentSrc={siteContent.logo}
+                alt="Logo da empresa"
+                className="h-12 w-auto"
+              />
               <div>
                 <EditableText path="siteName" value={siteContent.siteName} className="text-2xl font-bold" as="h1" />
                 <p className="text-orange-200 text-sm">Solicitar Orçamento</p>
@@ -264,7 +286,7 @@ Mensagem enviada através do site oficial ${siteContent.siteName}`
       </header>
 
       {/* Page Header */}
-      <section className="bg-gradient-to-r from-orange-600 to-orange-400 text-white py-16">
+      <section className="bg-gradient-to-r from-orange-600 to-orange-400 text-white py-16 relative z-10">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold mb-4">Solicitar Orçamento</h2>
           <p className="text-xl max-w-2xl mx-auto">
@@ -274,7 +296,7 @@ Mensagem enviada através do site oficial ${siteContent.siteName}`
       </section>
 
       {/* Form Section */}
-      <section className="py-16">
+      <section className="py-16 relative z-10">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
             <Card>
@@ -370,7 +392,7 @@ Mensagem enviada através do site oficial ${siteContent.siteName}`
       </section>
 
       {/* Contact Info */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 relative z-10">
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-2xl font-bold text-gray-900 mb-8">Outras Formas de Contato</h3>
           <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
@@ -419,6 +441,12 @@ Mensagem enviada através do site oficial ${siteContent.siteName}`
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-4">
+                <UploadableLogo
+                  path="logo"
+                  currentSrc={siteContent.logo}
+                  alt="Logo da empresa"
+                  className="h-12 w-auto"
+                />
                 <div>
                   <EditableText path="siteName" value={siteContent.siteName} className="text-xl font-bold" as="h4" />
                   <p className="text-gray-400 text-sm">Orçamento Gratuito</p>

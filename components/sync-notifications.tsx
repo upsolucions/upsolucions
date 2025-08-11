@@ -47,12 +47,28 @@ export function SyncNotifications() {
           break
 
         case 'error':
-          newToast = {
-            id: Date.now().toString(),
-            type: 'error',
-            title: 'Erro de Sincronização',
-            message: 'Falha ao sincronizar dados. Tentando novamente...',
-            duration: 5000
+          // Verificar se o Supabase está configurado antes de mostrar erro
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+          const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+          
+          const isSupabaseConfigured = supabaseUrl && 
+                                     !supabaseUrl.includes('localhost') && 
+                                     !supabaseUrl.includes('your-project') && 
+                                     supabaseUrl.startsWith('https://') &&
+                                     supabaseUrl.length > 20 &&
+                                     supabaseKey && 
+                                     supabaseKey !== 'demo-key' && 
+                                     supabaseKey.length > 20
+          
+          // Só mostrar erro se o Supabase estiver configurado
+          if (isSupabaseConfigured) {
+            newToast = {
+              id: Date.now().toString(),
+              type: 'error',
+              title: 'Erro de Sincronização',
+              message: 'Falha ao sincronizar dados. Tentando novamente...',
+              duration: 5000
+            }
           }
           break
       }

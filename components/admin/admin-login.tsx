@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Settings, LogOut, Eye, Calendar, TrendingUp, Activity, Wrench } from "lucide-react"
+import { Settings, LogOut, Eye, Calendar, TrendingUp, Activity, Wrench, Image } from "lucide-react"
 import { useAdmin } from "@/contexts/admin-context"
 import dynamic from "next/dynamic"
 
@@ -147,8 +147,19 @@ export function AdminLogin() {
           </CardContent>
         </Card>
 
-        {/* Botões de Sincronização */}
+        {/* Botões de Administração */}
         <div className="flex gap-2">
+          <Button
+            onClick={() => window.open('/admin/configuracoes', '_blank')}
+            variant="outline"
+            size="sm"
+            className="bg-indigo-500 hover:bg-indigo-600 text-white border-0 text-xs px-2 py-1 h-8"
+            title="Configurações de Marca D'água"
+          >
+            <Image className="w-3 h-3 mr-1" />
+            Marca
+          </Button>
+          
           <Button
             onClick={() => setShowSyncStatus(!showSyncStatus)}
             variant="outline"

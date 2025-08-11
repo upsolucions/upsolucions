@@ -2,6 +2,7 @@
 
 import { useAdmin } from '@/contexts/admin-context'
 import { ImageTestPanel } from '@/components/admin/image-test-panel'
+import { ImageFallbackFix } from '@/components/admin/image-fallback-fix'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Settings, Database } from 'lucide-react'
 import Link from 'next/link'
@@ -97,6 +98,11 @@ export default function DiagnosticsPage() {
 
         {/* Painel Principal */}
         <ImageTestPanel />
+        
+        {/* Correção de Imagens com Fallback */}
+        <div className="mt-8">
+          <ImageFallbackFix />
+        </div>
 
         {/* Informações Adicionais */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
