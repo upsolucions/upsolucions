@@ -127,7 +127,7 @@ export default function SolucoesPage() {
                         />
                       </div>
                     </CardHeader>
-                      <CardContent className="space-y-6">
+                    <CardContent className="space-y-6">
                         <EditableText
                           path={`solutions.items.${index}.fullDescription`}
                           value={solution.fullDescription}
