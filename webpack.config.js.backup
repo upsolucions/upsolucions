@@ -1,4 +1,3 @@
-
 // Otimizações específicas do webpack para performance
 module.exports = {
   // Configurações de cache

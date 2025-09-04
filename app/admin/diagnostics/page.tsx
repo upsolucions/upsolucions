@@ -3,6 +3,7 @@
 import { useAdmin } from '@/contexts/admin-context'
 import { ImageTestPanel } from '@/components/admin/image-test-panel'
 import { ImageFallbackFix } from '@/components/admin/image-fallback-fix'
+import { ChromeDiagnostics } from '@/components/chrome-diagnostics'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Settings, Database } from 'lucide-react'
 import Link from 'next/link'

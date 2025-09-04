@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import dynamic from "next/dynamic"
+import Script from "next/script"
 import "./globals.css"
 
 // Lazy load dos providers para melhor performance
@@ -60,6 +61,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className={inter.className}>
+        <Script 
+          src="/chrome-compatibility-fix.js" 
+          strategy="beforeInteractive"
+          priority
+        />
         <AdminProvider>
           {children}
           <SyncNotifications />
